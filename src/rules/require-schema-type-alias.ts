@@ -10,7 +10,7 @@ const rule: CreateRule = {
 	},
 	create(context) {
 		// Track exported schema const names and exported type alias names
-		const exportedSchemaConsts = new Map<string, ESTree.Identifier>();
+		const exportedSchemaConsts = new Map<string, ESTree.BindingIdentifier>();
 		const exportedTypeAliases = new Set<string>();
 
 		return {
@@ -38,7 +38,7 @@ const rule: CreateRule = {
 					const isSchemaRef = isSchemaReference(init);
 
 					if (isSchemaRef) {
-						exportedSchemaConsts.set(name, declarator.id as ESTree.Identifier);
+						exportedSchemaConsts.set(name, declarator.id as ESTree.BindingIdentifier);
 					}
 				}
 			},
