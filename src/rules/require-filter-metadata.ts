@@ -1,18 +1,19 @@
-import type { CreateRule, ESTree, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-import { isCallOfMember } from '../utils.ts';
+import * as Effect from 'effect/Effect';
+
+import { AST, Diagnostic, Rule, RuleContext } from 'effect-oxlint';
 
 const REQUIRED_KEYS = ['identifier', 'title', 'description'] as const;
 
 function checkOptionsObject(
-	reportFn: (opts: { node: unknown; message: string }) => void,
-	node: unknown,
 	fnName: string,
+	node: ESTree.Node,
 	optionsArg: ESTree.Argument
-): void {
+): ReadonlyArray<string> {
 	if (optionsArg.type !== 'ObjectExpression') {
 		// Options is not an object literal — cannot statically verify
-		return;
+		return [];
 	}
 
 	const presentKeys = new Set<string>();
@@ -27,69 +28,78 @@ function checkOptionsObject(
 		if (keyName) presentKeys.add(keyName);
 	}
 
-	const missing = REQUIRED_KEYS.filter((k) => !presentKeys.has(k));
-	if (missing.length > 0) {
-		reportFn({
-			node,
-			message: `\`${fnName}\` is missing required metadata: ${missing.map((k) => `\`${k}\``).join(', ')}. Reusable schema checks must include \`identifier\`, \`title\`, and \`description\`. (EF-12c)`
-		});
-	}
+	return REQUIRED_KEYS.filter((k) => !presentKeys.has(k));
 }
 
-const rule: CreateRule = {
-	meta: {
+export default Rule.define({
+	name: 'require-filter-metadata',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Schema.makeFilter/makeFilterGroup must include identifier, title, and description (EF-12c)'
-		}
-	},
-	create(context) {
-		const report = (opts: { node: unknown; message: string }) =>
-			context.report(opts as never);
-
+		description:
+			'Schema.makeFilter/makeFilterGroup must include identifier, title, and description (EF-12c)'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
 		return {
-			CallExpression(node) {
+			CallExpression: (node: ESTree.Node) => {
+				const call = node as ESTree.CallExpression;
+
 				// Schema.makeFilter(predicate) — needs 2nd arg with metadata
-				if (isCallOfMember(node, 'Schema', 'makeFilter')) {
-					const optionsArg = node.arguments[1];
+				if (AST.isCallOf(call, 'Schema', 'makeFilter')) {
+					const optionsArg = call.arguments[1];
 					if (!optionsArg) {
-						report({
-							node,
-							message:
-								'`Schema.makeFilter` must include a metadata object with `identifier`, `title`, and `description` as the second argument. (EF-12c)'
-						});
-						return;
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Schema.makeFilter` must include a metadata object with `identifier`, `title`, and `description` as the second argument. (EF-12c)'
+							})
+						);
 					}
-					checkOptionsObject(
-						report,
-						node,
+					const missing = checkOptionsObject(
 						'Schema.makeFilter',
+						node,
 						optionsArg
 					);
+					if (missing.length > 0) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message: `\`Schema.makeFilter\` is missing required metadata: ${missing.map((k) => `\`${k}\``).join(', ')}. Reusable schema checks must include \`identifier\`, \`title\`, and \`description\`. (EF-12c)`
+							})
+						);
+					}
 				}
 
 				// Schema.makeFilterGroup([filters]) — needs 2nd arg with metadata
-				if (isCallOfMember(node, 'Schema', 'makeFilterGroup')) {
-					const optionsArg = node.arguments[1];
+				if (AST.isCallOf(call, 'Schema', 'makeFilterGroup')) {
+					const optionsArg = call.arguments[1];
 					if (!optionsArg) {
-						report({
-							node,
-							message:
-								'`Schema.makeFilterGroup` must include a metadata object with `identifier`, `title`, and `description` as the second argument. (EF-12c)'
-						});
-						return;
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Schema.makeFilterGroup` must include a metadata object with `identifier`, `title`, and `description` as the second argument. (EF-12c)'
+							})
+						);
 					}
-					checkOptionsObject(
-						report,
-						node,
+					const missing = checkOptionsObject(
 						'Schema.makeFilterGroup',
+						node,
 						optionsArg
 					);
+					if (missing.length > 0) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message: `\`Schema.makeFilterGroup\` is missing required metadata: ${missing.map((k) => `\`${k}\``).join(', ')}. Reusable schema checks must include \`identifier\`, \`title\`, and \`description\`. (EF-12c)`
+							})
+						);
+					}
 				}
-			}
-		} satisfies Visitor;
-	}
-};
 
-export default rule;
+				return Effect.void;
+			}
+		};
+	}
+});

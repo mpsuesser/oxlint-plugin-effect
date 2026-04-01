@@ -1,27 +1,37 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-any.ts';
-import { runRule, tsAsExpr } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('avoid-any', () => {
 	it('flags as any', () => {
 		expect(
-			runRule(rule, 'TSAsExpression', tsAsExpr('TSAnyKeyword'))
+			Testing.runRule(
+				rule,
+				'TSAsExpression',
+				Testing.tsAsExpr('TSAnyKeyword')
+			)
 		).toHaveLength(1);
 	});
 	it('flags as unknown when parent is TSAsExpression (double cast)', () => {
-		const node = tsAsExpr('TSUnknownKeyword', { type: 'TSAsExpression' });
-		expect(runRule(rule, 'TSAsExpression', node)).toHaveLength(1);
+		const node = Testing.tsAsExpr('TSUnknownKeyword', {
+			type: 'TSAsExpression'
+		});
+		expect(Testing.runRule(rule, 'TSAsExpression', node)).toHaveLength(1);
 	});
 	it('allows as unknown standalone (not double cast)', () => {
-		const node = tsAsExpr('TSUnknownKeyword', {
+		const node = Testing.tsAsExpr('TSUnknownKeyword', {
 			type: 'ExpressionStatement'
 		});
-		expect(runRule(rule, 'TSAsExpression', node)).toHaveLength(0);
+		expect(Testing.runRule(rule, 'TSAsExpression', node)).toHaveLength(0);
 	});
 	it('allows as string', () => {
 		expect(
-			runRule(rule, 'TSAsExpression', tsAsExpr('TSStringKeyword'))
+			Testing.runRule(
+				rule,
+				'TSAsExpression',
+				Testing.tsAsExpr('TSStringKeyword')
+			)
 		).toHaveLength(0);
 	});
 });

@@ -1,13 +1,6 @@
-import { memberExprRule } from '../utils.ts';
+import { Rule } from 'effect-oxlint';
 
-export default memberExprRule(
-	'Disallow Data.TaggedError — use Schema.TaggedErrorClass instead (Effect v4)',
-	[
-		{
-			obj: 'Data',
-			prop: 'TaggedError',
-			message:
-				'Use `Schema.TaggedErrorClass` instead of `Data.TaggedError`. Schema-based errors integrate with decode/encode and carry structured metadata. (EF-1)'
-		}
-	]
-);
+export default Rule.banMember('Data', 'TaggedError', {
+	message:
+		'Use `Schema.TaggedErrorClass` instead of `Data.TaggedError`. Schema-based errors integrate with decode/encode and carry structured metadata. (EF-1)'
+});

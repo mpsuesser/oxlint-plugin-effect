@@ -1,30 +1,24 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-ts-ignore.ts';
-import { program, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('avoid-ts-ignore', () => {
 	it('flags @ts-ignore comment', () => {
-		const errors = runRule(rule, 'Program', program(), {
-			comments: [
-				{ type: 'Line', value: ' @ts-ignore', start: 0, end: 14 }
-			]
+		const errors = Testing.runRule(rule, 'Program', Testing.program(), {
+			comments: [Testing.comment('Line', ' @ts-ignore')]
 		});
 		expect(errors).toHaveLength(1);
 	});
 	it('flags @ts-expect-error comment', () => {
-		const errors = runRule(rule, 'Program', program(), {
-			comments: [
-				{ type: 'Line', value: ' @ts-expect-error', start: 0, end: 20 }
-			]
+		const errors = Testing.runRule(rule, 'Program', Testing.program(), {
+			comments: [Testing.comment('Line', ' @ts-expect-error')]
 		});
 		expect(errors).toHaveLength(1);
 	});
 	it('allows normal comments', () => {
-		const errors = runRule(rule, 'Program', program(), {
-			comments: [
-				{ type: 'Line', value: ' This is fine', start: 0, end: 16 }
-			]
+		const errors = Testing.runRule(rule, 'Program', Testing.program(), {
+			comments: [Testing.comment('Line', ' This is fine')]
 		});
 		expect(errors).toHaveLength(0);
 	});

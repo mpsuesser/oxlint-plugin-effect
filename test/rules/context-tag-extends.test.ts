@@ -1,53 +1,53 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/context-tag-extends.ts';
-import { callOfMember, classDecl, id, memberExpr, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('context-tag-extends', () => {
 	// ── ClassDeclaration: class FooTag extends Context.Tag<...>() ──
 	it('flags class FooTag extends Context.Tag()', () => {
-		const superClass = callOfMember('Context', 'Tag');
-		const node = classDecl('FooTag', superClass);
-		expect(runRule(rule, 'ClassDeclaration', node)).toHaveLength(1);
+		const superClass = Testing.callOfMember('Context', 'Tag');
+		const node = Testing.classDecl('FooTag', { superClass });
+		expect(Testing.runRule(rule, 'ClassDeclaration', node)).toHaveLength(1);
 	});
 
 	it('allows class Foo extends ServiceMap.Service()', () => {
-		const superClass = callOfMember('ServiceMap', 'Service');
-		const node = classDecl('Foo', superClass);
-		expect(runRule(rule, 'ClassDeclaration', node)).toHaveLength(0);
+		const superClass = Testing.callOfMember('ServiceMap', 'Service');
+		const node = Testing.classDecl('Foo', { superClass });
+		expect(Testing.runRule(rule, 'ClassDeclaration', node)).toHaveLength(0);
 	});
 
 	// ── MemberExpression: Context.GenericTag ──
 	it('flags Context.GenericTag', () => {
 		expect(
-			runRule(
+			Testing.runRule(
 				rule,
 				'MemberExpression',
-				memberExpr('Context', 'GenericTag')
+				Testing.memberExpr('Context', 'GenericTag')
 			)
 		).toHaveLength(1);
 	});
 
 	// ── MemberExpression: bare Context.Tag (merged from use-servicemap-service) ──
 	it('flags bare Context.Tag usage', () => {
-		const errors = runRule(
+		const errors = Testing.runRule(
 			rule,
 			'MemberExpression',
-			memberExpr('Context', 'Tag')
+			Testing.memberExpr('Context', 'Tag')
 		);
 		expect(errors).toHaveLength(1);
-		expect(errors[0]?.message).toContain('Context.Tag');
+		expect(errors[0]?.diagnostic.message).toContain('Context.Tag');
 	});
 
 	// ── MemberExpression: bare Effect.Service (merged from use-servicemap-service) ──
 	it('flags bare Effect.Service usage', () => {
-		const errors = runRule(
+		const errors = Testing.runRule(
 			rule,
 			'MemberExpression',
-			memberExpr('Effect', 'Service')
+			Testing.memberExpr('Effect', 'Service')
 		);
 		expect(errors).toHaveLength(1);
-		expect(errors[0]?.message).toContain('Effect.Service');
+		expect(errors[0]?.diagnostic.message).toContain('Effect.Service');
 	});
 
 	// ── CallExpression: class X extends Effect.Service<X>()() ──
@@ -56,13 +56,13 @@ describe('context-tag-extends', () => {
 			type: 'CallExpression',
 			callee: {
 				type: 'CallExpression',
-				callee: memberExpr('Effect', 'Service'),
+				callee: Testing.memberExpr('Effect', 'Service'),
 				arguments: []
 			},
 			arguments: [],
-			parent: { type: 'ClassDeclaration', id: id('MyService') }
+			parent: { type: 'ClassDeclaration', id: Testing.id('MyService') }
 		};
-		expect(runRule(rule, 'CallExpression', node)).toHaveLength(1);
+		expect(Testing.runRule(rule, 'CallExpression', node)).toHaveLength(1);
 	});
 
 	it('does not flag Effect.Service double-call outside class extends', () => {
@@ -70,28 +70,32 @@ describe('context-tag-extends', () => {
 			type: 'CallExpression',
 			callee: {
 				type: 'CallExpression',
-				callee: memberExpr('Effect', 'Service'),
+				callee: Testing.memberExpr('Effect', 'Service'),
 				arguments: []
 			},
 			arguments: [],
 			parent: { type: 'ExpressionStatement' }
 		};
-		expect(runRule(rule, 'CallExpression', node)).toHaveLength(0);
+		expect(Testing.runRule(rule, 'CallExpression', node)).toHaveLength(0);
 	});
 
 	// ── Negative: ServiceMap.Service is fine ──
 	it('allows Context.Layer', () => {
 		expect(
-			runRule(rule, 'MemberExpression', memberExpr('Context', 'Layer'))
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('Context', 'Layer')
+			)
 		).toHaveLength(0);
 	});
 
 	it('does not flag ServiceMap.Service', () => {
 		expect(
-			runRule(
+			Testing.runRule(
 				rule,
 				'MemberExpression',
-				memberExpr('ServiceMap', 'Service')
+				Testing.memberExpr('ServiceMap', 'Service')
 			)
 		).toHaveLength(0);
 	});

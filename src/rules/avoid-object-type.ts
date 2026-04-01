@@ -1,40 +1,48 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-const rule: CreateRule = {
-	meta: {
+import * as Effect from 'effect/Effect';
+
+import { Diagnostic, Rule, RuleContext, Visitor } from 'effect-oxlint';
+
+export default Rule.define({
+	name: 'avoid-object-type',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Disallow Object and {} as types — use Record, Schema, or specific interfaces'
-		}
-	},
-	create(context) {
-		return {
-			TSTypeReference(node) {
-				// Flag `: Object` type references
+		description:
+			'Disallow Object and {} as types — use Record, Schema, or specific interfaces'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
+		return Visitor.merge(
+			Visitor.on('TSTypeReference', (node: ESTree.Node) => {
+				const ref = node as ESTree.TSTypeReference;
 				if (
-					node.typeName.type === 'Identifier' &&
-					node.typeName.name === 'Object'
+					ref.typeName.type === 'Identifier' &&
+					ref.typeName.name === 'Object'
 				) {
-					context.report({
-						node,
-						message:
-							'Avoid using `Object` as a type — it provides no type safety. Use a specific interface, `Record<string, unknown>`, or a `Schema.Class`.'
-					});
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Avoid using `Object` as a type — it provides no type safety. Use a specific interface, `Record<string, unknown>`, or a `Schema.Class`.'
+						})
+					);
 				}
-			},
-			TSTypeLiteral(node) {
-				// Flag `: {}` empty object type literals
-				if (node.members.length === 0) {
-					context.report({
-						node,
-						message:
-							'Avoid using `{}` as a type — it matches any non-nullish value. Use `Record<string, never>` for an empty object, or a specific interface.'
-					});
+				return Effect.void;
+			}),
+			Visitor.on('TSTypeLiteral', (node: ESTree.Node) => {
+				const lit = node as ESTree.TSTypeLiteral;
+				if (lit.members.length === 0) {
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Avoid using `{}` as a type — it matches any non-nullish value. Use `Record<string, never>` for an empty object, or a specific interface.'
+						})
+					);
 				}
-			}
-		} satisfies Visitor;
+				return Effect.void;
+			})
+		);
 	}
-};
-
-export default rule;
+});

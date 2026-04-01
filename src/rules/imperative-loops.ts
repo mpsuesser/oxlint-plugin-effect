@@ -1,35 +1,18 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import { Rule } from 'effect-oxlint';
 
-const MESSAGE =
-	'Avoid imperative loops in domain code. Use `Arr.map`, `Arr.filter`, `Arr.filterMap`, `Arr.reduce`, or `Effect.forEach` for functional, composable transformations. (EF-5)';
-
-const rule: CreateRule = {
-	meta: {
-		type: 'suggestion',
-		docs: {
-			description:
-				'Disallow for/for-in/for-of/while/do-while loops — use functional Array helpers or Effect.forEach'
-		}
+export default Rule.banMultiple(
+	{
+		statements: [
+			'ForStatement',
+			'ForInStatement',
+			'ForOfStatement',
+			'WhileStatement',
+			'DoWhileStatement'
+		]
 	},
-	create(context) {
-		return {
-			ForStatement(node) {
-				context.report({ node, message: MESSAGE });
-			},
-			ForInStatement(node) {
-				context.report({ node, message: MESSAGE });
-			},
-			ForOfStatement(node) {
-				context.report({ node, message: MESSAGE });
-			},
-			WhileStatement(node) {
-				context.report({ node, message: MESSAGE });
-			},
-			DoWhileStatement(node) {
-				context.report({ node, message: MESSAGE });
-			}
-		} satisfies Visitor;
+	{
+		name: 'imperative-loops',
+		message:
+			'Avoid imperative loops in domain code. Use `Arr.map`, `Arr.filter`, `Arr.filterMap`, `Arr.reduce`, or `Effect.forEach` for functional, composable transformations. (EF-5)'
 	}
-};
-
-export default rule;
+);

@@ -1,4 +1,8 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
+
+import * as Effect from 'effect/Effect';
+
+import { Diagnostic, Rule, RuleContext } from 'effect-oxlint';
 
 const TYPEOF_MAP: Record<string, string> = {
 	string: 'P.isString',
@@ -11,23 +15,25 @@ const TYPEOF_MAP: Record<string, string> = {
 	object: 'P.isObject'
 };
 
-const rule: CreateRule = {
-	meta: {
+export default Rule.define({
+	name: 'prefer-effect-is',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Prefer Effect Predicate helpers over typeof checks (EF-6)'
-		}
-	},
-	create(context) {
+		description: 'Prefer Effect Predicate helpers over typeof checks (EF-6)'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
 		return {
-			BinaryExpression(node) {
-				if (node.operator !== '===' && node.operator !== '!==') return;
+			BinaryExpression: (node: ESTree.Node) => {
+				const bin = node as ESTree.BinaryExpression;
+				if (bin.operator !== '===' && bin.operator !== '!==') {
+					return Effect.void;
+				}
 
 				// Match: typeof x === "string" or "string" === typeof x
 				let typeofArg: string | undefined;
 
-				const { left, right } = node;
+				const { left, right } = bin;
 
 				if (
 					left.type === 'UnaryExpression' &&
@@ -45,17 +51,17 @@ const rule: CreateRule = {
 					typeofArg = left.value;
 				}
 
-				if (!typeofArg) return;
+				if (!typeofArg) return Effect.void;
 				const predicate = TYPEOF_MAP[typeofArg];
-				if (!predicate) return;
+				if (!predicate) return Effect.void;
 
-				context.report({
-					node,
-					message: `Use \`${predicate}(x)\` instead of \`typeof x ${node.operator} "${typeofArg}"\`. Effect Predicate helpers are composable and type-safe. (EF-6)`
-				});
+				return ctx.report(
+					Diagnostic.make({
+						node,
+						message: `Use \`${predicate}(x)\` instead of \`typeof x ${bin.operator} "${typeofArg}"\`. Effect Predicate helpers are composable and type-safe. (EF-6)`
+					})
+				);
 			}
-		} satisfies Visitor;
+		};
 	}
-};
-
-export default rule;
+});

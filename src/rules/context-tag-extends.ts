@@ -1,130 +1,164 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-import { isMemberExpr } from '../utils.ts';
+import * as Effect from 'effect/Effect';
 
-const rule: CreateRule = {
-	meta: {
+import { AST, Diagnostic, Rule, RuleContext, Visitor } from 'effect-oxlint';
+
+export default Rule.define({
+	name: 'context-tag-extends',
+	meta: Rule.meta({
 		type: 'problem',
-		docs: {
-			description:
-				'Disallow removed Context/Effect service APIs — use ServiceMap.Service (Effect v4)'
-		}
-	},
-	create(context) {
-		return {
-			ClassDeclaration(node) {
-				// Flag `class FooTag extends Context.Tag<...>`
-				if (
-					node.id &&
-					node.id.name.endsWith('Tag') &&
-					node.superClass &&
-					node.superClass.type === 'CallExpression' &&
-					node.superClass.callee.type === 'MemberExpression' &&
-					isMemberExpr(node.superClass.callee, 'Context', 'Tag')
-				) {
-					context.report({
-						node,
-						message:
-							'The `class *Tag extends Context.Tag` pattern was removed in Effect v4. Use `ServiceMap.Service` instead, and name the service directly (no *Tag suffix).'
-					});
-				}
-			},
-			MemberExpression(node) {
-				// Flag `Context.GenericTag<...>`
-				if (isMemberExpr(node, 'Context', 'GenericTag')) {
-					context.report({
-						node,
-						message:
-							'`Context.GenericTag` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
-					});
-				}
-
-				// Flag bare `Context.Tag` usage (non-class-extends positions)
-				if (isMemberExpr(node, 'Context', 'Tag')) {
-					context.report({
-						node,
-						message:
-							'`Context.Tag` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
-					});
-				}
-
-				// Flag bare `Effect.Service` usage (non-class-extends positions)
-				if (isMemberExpr(node, 'Effect', 'Service')) {
-					context.report({
-						node,
-						message:
-							'`Effect.Service` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
-					});
-				}
-
-				// Flag `Context.Reference` — replaced by ServiceMap.Reference
-				if (isMemberExpr(node, 'Context', 'Reference')) {
-					context.report({
-						node,
-						message:
-							'`Context.Reference` was removed in Effect v4. Use `ServiceMap.Reference` instead.'
-					});
-				}
-
-				// Flag `Context.make` — replaced by ServiceMap.make
-				if (isMemberExpr(node, 'Context', 'make')) {
-					context.report({
-						node,
-						message:
-							'`Context.make` was removed in Effect v4. Use `ServiceMap.make` instead.'
-					});
-				}
-
-				// Flag `Context.get` — replaced by ServiceMap.get
-				if (isMemberExpr(node, 'Context', 'get')) {
-					context.report({
-						node,
-						message:
-							'`Context.get` was removed in Effect v4. Use `ServiceMap.get` instead.'
-					});
-				}
-
-				// Flag `Context.add` — replaced by ServiceMap.add
-				if (isMemberExpr(node, 'Context', 'add')) {
-					context.report({
-						node,
-						message:
-							'`Context.add` was removed in Effect v4. Use `ServiceMap.add` instead.'
-					});
-				}
-
-				// Flag `Context.mergeAll` — replaced by ServiceMap.mergeAll
-				if (isMemberExpr(node, 'Context', 'mergeAll')) {
-					context.report({
-						node,
-						message:
-							'`Context.mergeAll` was removed in Effect v4. Use `ServiceMap.mergeAll` instead.'
-					});
-				}
-			},
-			// Also catch `class X extends Effect.Service<X>()`
-			CallExpression(node) {
-				if (
-					node.callee.type === 'CallExpression' &&
-					node.callee.callee.type === 'MemberExpression' &&
-					isMemberExpr(node.callee.callee, 'Effect', 'Service')
-				) {
-					// Only flag if it's in a class extends position
-					const { parent } = node;
+		description:
+			'Disallow removed Context/Effect service APIs — use ServiceMap.Service (Effect v4)'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
+		return Visitor.merge(
+			{
+				ClassDeclaration: (node: ESTree.Node) => {
+					const decl = node as ESTree.Class;
+					// Flag `class FooTag extends Context.Tag<...>`
 					if (
-						parent?.type === 'ClassDeclaration' ||
-						parent?.type === 'ClassExpression'
+						decl.id &&
+						decl.id.name.endsWith('Tag') &&
+						decl.superClass &&
+						decl.superClass.type === 'CallExpression' &&
+						decl.superClass.callee.type === 'MemberExpression' &&
+						AST.isMember(decl.superClass.callee, 'Context', 'Tag')
 					) {
-						context.report({
-							node,
-							message:
-								'`Effect.Service` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
-						});
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'The `class *Tag extends Context.Tag` pattern was removed in Effect v4. Use `ServiceMap.Service` instead, and name the service directly (no *Tag suffix).'
+							})
+						);
 					}
+					return Effect.void;
+				}
+			},
+			{
+				MemberExpression: (node: ESTree.Node) => {
+					const member = node as ESTree.MemberExpression;
+
+					// Flag `Context.GenericTag<...>`
+					if (AST.isMember(member, 'Context', 'GenericTag')) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Context.GenericTag` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
+							})
+						);
+					}
+
+					// Flag bare `Context.Tag` usage
+					if (AST.isMember(member, 'Context', 'Tag')) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Context.Tag` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
+							})
+						);
+					}
+
+					// Flag bare `Effect.Service` usage
+					if (AST.isMember(member, 'Effect', 'Service')) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Effect.Service` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
+							})
+						);
+					}
+
+					// Flag `Context.Reference`
+					if (AST.isMember(member, 'Context', 'Reference')) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Context.Reference` was removed in Effect v4. Use `ServiceMap.Reference` instead.'
+							})
+						);
+					}
+
+					// Flag `Context.make`
+					if (AST.isMember(member, 'Context', 'make')) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Context.make` was removed in Effect v4. Use `ServiceMap.make` instead.'
+							})
+						);
+					}
+
+					// Flag `Context.get`
+					if (AST.isMember(member, 'Context', 'get')) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Context.get` was removed in Effect v4. Use `ServiceMap.get` instead.'
+							})
+						);
+					}
+
+					// Flag `Context.add`
+					if (AST.isMember(member, 'Context', 'add')) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Context.add` was removed in Effect v4. Use `ServiceMap.add` instead.'
+							})
+						);
+					}
+
+					// Flag `Context.mergeAll`
+					if (AST.isMember(member, 'Context', 'mergeAll')) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`Context.mergeAll` was removed in Effect v4. Use `ServiceMap.mergeAll` instead.'
+							})
+						);
+					}
+
+					return Effect.void;
+				}
+			},
+			{
+				// Also catch `class X extends Effect.Service<X>()`
+				CallExpression: (node: ESTree.Node) => {
+					const call = node as ESTree.CallExpression;
+					if (
+						call.callee.type === 'CallExpression' &&
+						call.callee.callee.type === 'MemberExpression' &&
+						AST.isMember(call.callee.callee, 'Effect', 'Service')
+					) {
+						// Only flag if it's in a class extends position
+						const { parent } = call;
+						if (
+							parent?.type === 'ClassDeclaration' ||
+							parent?.type === 'ClassExpression'
+						) {
+							return ctx.report(
+								Diagnostic.make({
+									node,
+									message:
+										'`Effect.Service` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
+								})
+							);
+						}
+					}
+					return Effect.void;
 				}
 			}
-		} satisfies Visitor;
+		);
 	}
-};
-
-export default rule;
+});

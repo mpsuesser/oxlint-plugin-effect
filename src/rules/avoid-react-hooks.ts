@@ -1,4 +1,9 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
+
+import * as Effect from 'effect/Effect';
+import * as Option from 'effect/Option';
+
+import { AST, Diagnostic, Rule, RuleContext } from 'effect-oxlint';
 
 const REACT_HOOKS = new Set([
 	'useState',
@@ -17,29 +22,31 @@ const REACT_HOOKS = new Set([
 	'useInsertionEffect'
 ]);
 
-const rule: CreateRule = {
-	meta: {
+export default Rule.define({
+	name: 'avoid-react-hooks',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Disallow React hooks — use View Models with Effect Atom instead'
-		}
-	},
-	create(context) {
+		description:
+			'Disallow React hooks — use View Models with Effect Atom instead'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
 		return {
-			CallExpression(node) {
-				if (
-					node.callee.type === 'Identifier' &&
-					REACT_HOOKS.has(node.callee.name)
-				) {
-					context.report({
-						node,
-						message: `Avoid \`${node.callee.name}\` — use View Models with Effect Atom instead. State belongs in atoms, effects in actions, components as pure renderers.`
-					});
-				}
+			CallExpression: (node: ESTree.Node) => {
+				const call = node as ESTree.CallExpression;
+				return Option.match(AST.calleeName(call), {
+					onNone: () => Effect.void,
+					onSome: (name) =>
+						REACT_HOOKS.has(name)
+							? ctx.report(
+									Diagnostic.make({
+										node,
+										message: `Avoid \`${name}\` — use View Models with Effect Atom instead. State belongs in atoms, effects in actions, components as pure renderers.`
+									})
+								)
+							: Effect.void
+				});
 			}
-		} satisfies Visitor;
+		};
 	}
-};
-
-export default rule;
+});

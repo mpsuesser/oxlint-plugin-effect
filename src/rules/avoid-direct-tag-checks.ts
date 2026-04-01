@@ -1,44 +1,53 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-const rule: CreateRule = {
-	meta: {
+import * as Effect from 'effect/Effect';
+
+import { Diagnostic, Rule, RuleContext } from 'effect-oxlint';
+
+export default Rule.define({
+	name: 'avoid-direct-tag-checks',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				"Disallow direct ._tag === '...' checks — use $is, $match, or Match for tagged union discrimination"
-		}
-	},
-	create(context) {
+		description:
+			"Disallow direct ._tag === '...' checks — use $is, $match, or Match for tagged union discrimination"
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
 		return {
-			BinaryExpression(node) {
-				if (node.operator !== '===' && node.operator !== '!==') return;
+			BinaryExpression: (node: ESTree.Node) => {
+				const bin = node as ESTree.BinaryExpression;
+				if (bin.operator !== '===' && bin.operator !== '!==') {
+					return Effect.void;
+				}
 
-				// Check left side for `._tag` or `_tag` member access
+				// Check left side for `._tag` member access
 				const isTagCheck =
-					node.left.type === 'MemberExpression' &&
-					node.left.property.type === 'Identifier' &&
-					node.left.property.name === '_tag' &&
-					(node.right.type === 'Literal' ||
-						node.right.type === 'TemplateLiteral');
+					bin.left.type === 'MemberExpression' &&
+					bin.left.property.type === 'Identifier' &&
+					bin.left.property.name === '_tag' &&
+					(bin.right.type === 'Literal' ||
+						bin.right.type === 'TemplateLiteral');
 
 				// Also check reversed: `"Tag" === x._tag`
 				const isReversedTagCheck =
-					node.right.type === 'MemberExpression' &&
-					node.right.property.type === 'Identifier' &&
-					node.right.property.name === '_tag' &&
-					(node.left.type === 'Literal' ||
-						node.left.type === 'TemplateLiteral');
+					bin.right.type === 'MemberExpression' &&
+					bin.right.property.type === 'Identifier' &&
+					bin.right.property.name === '_tag' &&
+					(bin.left.type === 'Literal' ||
+						bin.left.type === 'TemplateLiteral');
 
 				if (isTagCheck || isReversedTagCheck) {
-					context.report({
-						node,
-						message:
-							'Avoid direct `._tag === "..."` checks. Use `$is("Tag")` for type guards, `$match` for exhaustive pattern matching, or `Match.value(...).pipe(Match.when(...))` for composable branching. (EF-7)'
-					});
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Avoid direct `._tag === "..."` checks. Use `$is("Tag")` for type guards, `$match` for exhaustive pattern matching, or `Match.value(...).pipe(Match.when(...))` for composable branching. (EF-7)'
+						})
+					);
 				}
-			}
-		} satisfies Visitor;
-	}
-};
 
-export default rule;
+				return Effect.void;
+			}
+		};
+	}
+});

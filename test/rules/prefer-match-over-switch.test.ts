@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/prefer-match-over-switch.ts';
-import { runRule, switchStmt } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('prefer-match-over-switch', () => {
 	it('flags SwitchStatement', () => {
-		expect(runRule(rule, 'SwitchStatement', switchStmt())).toHaveLength(1);
+		expect(
+			Testing.runRule(rule, 'SwitchStatement', Testing.switchStmt())
+		).toHaveLength(1);
 	});
 });

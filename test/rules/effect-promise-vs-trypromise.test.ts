@@ -1,20 +1,24 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/effect-promise-vs-trypromise.ts';
-import { memberExpr, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('effect-promise-vs-trypromise', () => {
 	it('flags Effect.promise', () => {
 		expect(
-			runRule(rule, 'MemberExpression', memberExpr('Effect', 'promise'))
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('Effect', 'promise')
+			)
 		).toHaveLength(1);
 	});
 	it('allows Effect.tryPromise', () => {
 		expect(
-			runRule(
+			Testing.runRule(
 				rule,
 				'MemberExpression',
-				memberExpr('Effect', 'tryPromise')
+				Testing.memberExpr('Effect', 'tryPromise')
 			)
 		).toHaveLength(0);
 	});

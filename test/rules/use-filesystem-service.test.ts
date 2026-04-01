@@ -1,27 +1,39 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/use-filesystem-service.ts';
-import { importDecl, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('use-filesystem-service', () => {
 	it('flags node:fs', () => {
 		expect(
-			runRule(rule, 'ImportDeclaration', importDecl('node:fs'))
+			Testing.runRule(
+				rule,
+				'ImportDeclaration',
+				Testing.importDecl('node:fs')
+			)
 		).toHaveLength(1);
 	});
 	it('flags fs', () => {
 		expect(
-			runRule(rule, 'ImportDeclaration', importDecl('fs'))
+			Testing.runRule(rule, 'ImportDeclaration', Testing.importDecl('fs'))
 		).toHaveLength(1);
 	});
 	it('flags node:fs/promises', () => {
 		expect(
-			runRule(rule, 'ImportDeclaration', importDecl('node:fs/promises'))
+			Testing.runRule(
+				rule,
+				'ImportDeclaration',
+				Testing.importDecl('node:fs/promises')
+			)
 		).toHaveLength(1);
 	});
 	it('allows @effect/platform', () => {
 		expect(
-			runRule(rule, 'ImportDeclaration', importDecl('@effect/platform'))
+			Testing.runRule(
+				rule,
+				'ImportDeclaration',
+				Testing.importDecl('@effect/platform')
+			)
 		).toHaveLength(0);
 	});
 });

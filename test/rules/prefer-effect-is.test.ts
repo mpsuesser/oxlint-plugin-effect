@@ -1,66 +1,70 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/prefer-effect-is.ts';
-import { binaryExpr, strLiteral, unaryExpr, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('prefer-effect-is', () => {
 	it('flags typeof x === "string"', () => {
-		const node = binaryExpr(
+		const node = Testing.binaryExpr(
 			'===',
-			unaryExpr('typeof', { type: 'Identifier', name: 'x' }),
-			strLiteral('string')
+			Testing.unaryExpr('typeof', { type: 'Identifier', name: 'x' }),
+			Testing.strLiteral('string')
 		);
-		const errors = runRule(rule, 'BinaryExpression', node);
+		const errors = Testing.runRule(rule, 'BinaryExpression', node);
 		expect(errors.length).toBe(1);
-		expect(errors[0]?.message).toContain('P.isString');
+		expect(errors[0]?.diagnostic.message).toContain('P.isString');
 	});
 
 	it('flags "number" === typeof x (reversed)', () => {
-		const node = binaryExpr(
+		const node = Testing.binaryExpr(
 			'===',
-			strLiteral('number'),
-			unaryExpr('typeof', { type: 'Identifier', name: 'x' })
+			Testing.strLiteral('number'),
+			Testing.unaryExpr('typeof', { type: 'Identifier', name: 'x' })
 		);
-		const errors = runRule(rule, 'BinaryExpression', node);
+		const errors = Testing.runRule(rule, 'BinaryExpression', node);
 		expect(errors.length).toBe(1);
-		expect(errors[0]?.message).toContain('P.isNumber');
+		expect(errors[0]?.diagnostic.message).toContain('P.isNumber');
 	});
 
 	it('flags typeof x !== "boolean"', () => {
-		const node = binaryExpr(
+		const node = Testing.binaryExpr(
 			'!==',
-			unaryExpr('typeof', { type: 'Identifier', name: 'x' }),
-			strLiteral('boolean')
+			Testing.unaryExpr('typeof', { type: 'Identifier', name: 'x' }),
+			Testing.strLiteral('boolean')
 		);
-		const errors = runRule(rule, 'BinaryExpression', node);
+		const errors = Testing.runRule(rule, 'BinaryExpression', node);
 		expect(errors.length).toBe(1);
-		expect(errors[0]?.message).toContain('P.isBoolean');
+		expect(errors[0]?.diagnostic.message).toContain('P.isBoolean');
 	});
 
 	it('flags typeof x === "bigint"', () => {
-		const node = binaryExpr(
+		const node = Testing.binaryExpr(
 			'===',
-			unaryExpr('typeof', { type: 'Identifier', name: 'x' }),
-			strLiteral('bigint')
+			Testing.unaryExpr('typeof', { type: 'Identifier', name: 'x' }),
+			Testing.strLiteral('bigint')
 		);
-		const errors = runRule(rule, 'BinaryExpression', node);
+		const errors = Testing.runRule(rule, 'BinaryExpression', node);
 		expect(errors.length).toBe(1);
-		expect(errors[0]?.message).toContain('P.isBigInt');
+		expect(errors[0]?.diagnostic.message).toContain('P.isBigInt');
 	});
 
 	it('does not flag non-typeof comparisons', () => {
-		const node = binaryExpr('===', strLiteral('foo'), strLiteral('bar'));
-		const errors = runRule(rule, 'BinaryExpression', node);
+		const node = Testing.binaryExpr(
+			'===',
+			Testing.strLiteral('foo'),
+			Testing.strLiteral('bar')
+		);
+		const errors = Testing.runRule(rule, 'BinaryExpression', node);
 		expect(errors.length).toBe(0);
 	});
 
 	it('does not flag == operator (only strict equality)', () => {
-		const node = binaryExpr(
+		const node = Testing.binaryExpr(
 			'==',
-			unaryExpr('typeof', { type: 'Identifier', name: 'x' }),
-			strLiteral('string')
+			Testing.unaryExpr('typeof', { type: 'Identifier', name: 'x' }),
+			Testing.strLiteral('string')
 		);
-		const errors = runRule(rule, 'BinaryExpression', node);
+		const errors = Testing.runRule(rule, 'BinaryExpression', node);
 		expect(errors.length).toBe(0);
 	});
 });

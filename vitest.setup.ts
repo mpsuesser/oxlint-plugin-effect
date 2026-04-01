@@ -1,1 +1,1 @@
-// vitest setup
+export {};

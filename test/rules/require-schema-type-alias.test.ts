@@ -1,53 +1,49 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/require-schema-type-alias.ts';
-import {
-	exportNamedDecl,
-	id,
-	memberExpr,
-	runRuleMulti,
-	typeAliasDecl
-} from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('require-schema-type-alias', () => {
 	it('flags exported schema const without type alias', () => {
-		const exportDecl = exportNamedDecl({
+		const exportDecl = Testing.exportNamedDecl({
 			type: 'VariableDeclaration',
 			kind: 'const',
 			declarations: [
 				{
 					type: 'VariableDeclarator',
-					id: id('OrderId'),
-					init: memberExpr('Schema', 'String')
+					id: Testing.id('OrderId'),
+					init: Testing.memberExpr('Schema', 'String')
 				}
 			]
 		});
 
-		const errors = runRuleMulti(rule, [
+		const errors = Testing.runRuleMulti(rule, [
 			['ExportNamedDeclaration', exportDecl],
 			['Program:exit' as never, { type: 'Program' }]
 		]);
 		expect(errors.length).toBe(1);
-		expect(errors[0]?.message).toContain(
+		expect(errors[0]?.diagnostic.message).toContain(
 			'export type OrderId = typeof OrderId.Type'
 		);
 	});
 
 	it('does not flag when matching type alias exists', () => {
-		const schemaExport = exportNamedDecl({
+		const schemaExport = Testing.exportNamedDecl({
 			type: 'VariableDeclaration',
 			kind: 'const',
 			declarations: [
 				{
 					type: 'VariableDeclarator',
-					id: id('OrderId'),
-					init: memberExpr('Schema', 'String')
+					id: Testing.id('OrderId'),
+					init: Testing.memberExpr('Schema', 'String')
 				}
 			]
 		});
-		const typeExport = exportNamedDecl(typeAliasDecl('OrderId'));
+		const typeExport = Testing.exportNamedDecl(
+			Testing.typeAliasDecl('OrderId')
+		);
 
-		const errors = runRuleMulti(rule, [
+		const errors = Testing.runRuleMulti(rule, [
 			['ExportNamedDeclaration', schemaExport],
 			['ExportNamedDeclaration', typeExport],
 			['Program:exit' as never, { type: 'Program' }]
@@ -56,19 +52,19 @@ describe('require-schema-type-alias', () => {
 	});
 
 	it('does not flag non-schema exports', () => {
-		const exportDecl = exportNamedDecl({
+		const exportDecl = Testing.exportNamedDecl({
 			type: 'VariableDeclaration',
 			kind: 'const',
 			declarations: [
 				{
 					type: 'VariableDeclarator',
-					id: id('myValue'),
+					id: Testing.id('myValue'),
 					init: { type: 'Literal', value: 42 }
 				}
 			]
 		});
 
-		const errors = runRuleMulti(rule, [
+		const errors = Testing.runRuleMulti(rule, [
 			['ExportNamedDeclaration', exportDecl],
 			['Program:exit' as never, { type: 'Program' }]
 		]);

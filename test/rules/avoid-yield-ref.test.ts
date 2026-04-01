@@ -1,27 +1,43 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-yield-ref.ts';
-import { id, runRule, yieldExpr } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('avoid-yield-ref', () => {
 	it('flags yield* ref', () => {
 		expect(
-			runRule(rule, 'YieldExpression', yieldExpr(id('ref'), true))
+			Testing.runRule(
+				rule,
+				'YieldExpression',
+				Testing.yieldExpr(Testing.id('ref'), true)
+			)
 		).toHaveLength(1);
 	});
 	it('flags yield* deferred', () => {
 		expect(
-			runRule(rule, 'YieldExpression', yieldExpr(id('deferred'), true))
+			Testing.runRule(
+				rule,
+				'YieldExpression',
+				Testing.yieldExpr(Testing.id('deferred'), true)
+			)
 		).toHaveLength(1);
 	});
 	it('flags yield* fiber', () => {
 		expect(
-			runRule(rule, 'YieldExpression', yieldExpr(id('fiber'), true))
+			Testing.runRule(
+				rule,
+				'YieldExpression',
+				Testing.yieldExpr(Testing.id('fiber'), true)
+			)
 		).toHaveLength(1);
 	});
 	it('flags yield* latch', () => {
 		expect(
-			runRule(rule, 'YieldExpression', yieldExpr(id('latch'), true))
+			Testing.runRule(
+				rule,
+				'YieldExpression',
+				Testing.yieldExpr(Testing.id('latch'), true)
+			)
 		).toHaveLength(1);
 	});
 	it('allows yield* Ref.get(ref)', () => {
@@ -29,17 +45,25 @@ describe('avoid-yield-ref', () => {
 			type: 'CallExpression',
 			callee: {
 				type: 'MemberExpression',
-				object: id('Ref'),
-				property: id('get')
+				object: Testing.id('Ref'),
+				property: Testing.id('get')
 			}
 		};
 		expect(
-			runRule(rule, 'YieldExpression', yieldExpr(refGet, true))
+			Testing.runRule(
+				rule,
+				'YieldExpression',
+				Testing.yieldExpr(refGet, true)
+			)
 		).toHaveLength(0);
 	});
 	it('ignores non-delegate yield', () => {
 		expect(
-			runRule(rule, 'YieldExpression', yieldExpr(id('ref'), false))
+			Testing.runRule(
+				rule,
+				'YieldExpression',
+				Testing.yieldExpr(Testing.id('ref'), false)
+			)
 		).toHaveLength(0);
 	});
 });

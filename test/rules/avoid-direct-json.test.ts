@@ -1,25 +1,33 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-direct-json.ts';
-import { memberExpr, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('avoid-direct-json', () => {
 	it('flags JSON.parse', () => {
 		expect(
-			runRule(rule, 'MemberExpression', memberExpr('JSON', 'parse'))
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('JSON', 'parse')
+			)
 		).toHaveLength(1);
 	});
 	it('flags JSON.stringify', () => {
 		expect(
-			runRule(rule, 'MemberExpression', memberExpr('JSON', 'stringify'))
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('JSON', 'stringify')
+			)
 		).toHaveLength(1);
 	});
 	it('allows Schema.fromJsonString', () => {
 		expect(
-			runRule(
+			Testing.runRule(
 				rule,
 				'MemberExpression',
-				memberExpr('Schema', 'fromJsonString')
+				Testing.memberExpr('Schema', 'fromJsonString')
 			)
 		).toHaveLength(0);
 	});

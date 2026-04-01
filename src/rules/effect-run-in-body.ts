@@ -1,13 +1,6 @@
-import { memberExprRule } from '../utils.ts';
+import { Rule } from 'effect-oxlint';
 
-export default memberExprRule(
-	'Disallow Effect.runSync/runPromise outside entrypoints — keep runtime execution at boundaries',
-	[
-		{
-			obj: 'Effect',
-			prop: ['runSync', 'runPromise', 'runFork'],
-			message:
-				'Avoid `Effect.runSync`/`Effect.runPromise`/`Effect.runFork` in library or domain code. Keep runtime execution at the boundary (entrypoint/test harness). Return `Effect` values instead. (EF-21)'
-		}
-	]
-);
+export default Rule.banMember('Effect', ['runSync', 'runPromise', 'runFork'], {
+	message:
+		'Avoid `Effect.runSync`/`Effect.runPromise`/`Effect.runFork` in library or domain code. Keep runtime execution at the boundary (entrypoint/test harness). Return `Effect` values instead. (EF-21)'
+});

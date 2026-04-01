@@ -1,49 +1,56 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-const rule: CreateRule = {
-	meta: {
+import * as Effect from 'effect/Effect';
+
+import { Diagnostic, Rule, RuleContext } from 'effect-oxlint';
+
+export default Rule.define({
+	name: 'casting-awareness',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Flag type assertions (as T) — verify the cast is necessary or improve upstream types'
-		}
-	},
-	create(context) {
+		description:
+			'Flag type assertions (as T) — verify the cast is necessary or improve upstream types'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
 		return {
-			TSAsExpression(node) {
-				// Skip `as const` — it's always acceptable (narrows to literal types)
-				if (node.typeAnnotation.type === 'TSTypeReference') {
-					const name = node.typeAnnotation.typeName;
+			TSAsExpression: (node: ESTree.Node) => {
+				const tsAs = node as ESTree.TSAsExpression;
+
+				// Skip `as const`
+				if (tsAs.typeAnnotation.type === 'TSTypeReference') {
+					const name = tsAs.typeAnnotation.typeName;
 					if (name.type === 'Identifier' && name.name === 'const') {
-						return;
+						return Effect.void;
 					}
 				}
-				// Skip TSLiteralType which covers `as const` in some AST representations
-				if (node.typeAnnotation.type === 'TSLiteralType') {
-					return;
+
+				// Skip TSLiteralType (`as const` in some AST forms)
+				if (tsAs.typeAnnotation.type === 'TSLiteralType') {
+					return Effect.void;
 				}
 
-				// Skip `as any` and `as unknown as T` — handled by avoid-any rule
+				// Skip `as any` and `as unknown` — handled by avoid-any
 				if (
-					node.typeAnnotation.type === 'TSAnyKeyword' ||
-					node.typeAnnotation.type === 'TSUnknownKeyword'
+					tsAs.typeAnnotation.type === 'TSAnyKeyword' ||
+					tsAs.typeAnnotation.type === 'TSUnknownKeyword'
 				) {
-					return;
+					return Effect.void;
 				}
 
-				// Skip `as never` — standard pattern for exhaustive checks
-				if (node.typeAnnotation.type === 'TSNeverKeyword') {
-					return;
+				// Skip `as never` — standard exhaustive check pattern
+				if (tsAs.typeAnnotation.type === 'TSNeverKeyword') {
+					return Effect.void;
 				}
 
-				context.report({
-					node,
-					message:
-						'Type assertion `as T` tells the compiler "trust me." Before casting, check: (1) is the cast redundant? (2) can generics or Schema.decode replace it? (3) does the upstream type need fixing? `as const` is always acceptable.'
-				});
+				return ctx.report(
+					Diagnostic.make({
+						node,
+						message:
+							'Type assertion `as T` tells the compiler "trust me." Before casting, check: (1) is the cast redundant? (2) can generics or Schema.decode replace it? (3) does the upstream type need fixing? `as const` is always acceptable.'
+					})
+				);
 			}
-		} satisfies Visitor;
+		};
 	}
-};
-
-export default rule;
+});

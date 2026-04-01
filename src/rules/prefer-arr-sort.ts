@@ -1,38 +1,45 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-const rule: CreateRule = {
-	meta: {
+import * as Effect from 'effect/Effect';
+
+import { Diagnostic, Rule, RuleContext } from 'effect-oxlint';
+
+export default Rule.define({
+	name: 'prefer-arr-sort',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Disallow native .sort() — use Arr.sort with explicit Order instead'
-		}
-	},
-	create(context) {
+		description:
+			'Disallow native .sort() — use Arr.sort with explicit Order instead'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
 		return {
-			CallExpression(node) {
+			CallExpression: (node: ESTree.Node) => {
+				const call = node as ESTree.CallExpression;
 				if (
-					node.callee.type !== 'MemberExpression' ||
-					node.callee.property.type !== 'Identifier' ||
-					node.callee.property.name !== 'sort'
-				)
-					return;
+					call.callee.type !== 'MemberExpression' ||
+					call.callee.property.type !== 'Identifier' ||
+					call.callee.property.name !== 'sort'
+				) {
+					return Effect.void;
+				}
 
 				// Allow Arr.sort(...)
 				if (
-					node.callee.object.type === 'Identifier' &&
-					node.callee.object.name === 'Arr'
-				)
-					return;
+					call.callee.object.type === 'Identifier' &&
+					call.callee.object.name === 'Arr'
+				) {
+					return Effect.void;
+				}
 
-				context.report({
-					node,
-					message:
-						'Avoid native `.sort()`. Use `Arr.sort(items, order)` from `effect/Array` with an explicit `Order` for predictable, immutable sorting. (EF-38)'
-				});
+				return ctx.report(
+					Diagnostic.make({
+						node,
+						message:
+							'Avoid native `.sort()`. Use `Arr.sort(items, order)` from `effect/Array` with an explicit `Order` for predictable, immutable sorting. (EF-38)'
+					})
+				);
 			}
-		} satisfies Visitor;
+		};
 	}
-};
-
-export default rule;
+});

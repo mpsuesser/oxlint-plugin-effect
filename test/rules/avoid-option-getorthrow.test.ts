@@ -1,26 +1,34 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-option-getorthrow.ts';
-import { memberExpr, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('avoid-option-getorthrow', () => {
 	it('flags Option.getOrThrow', () => {
 		expect(
-			runRule(
+			Testing.runRule(
 				rule,
 				'MemberExpression',
-				memberExpr('Option', 'getOrThrow')
+				Testing.memberExpr('Option', 'getOrThrow')
 			)
 		).toHaveLength(1);
 	});
 	it('allows Option.getOrElse', () => {
 		expect(
-			runRule(rule, 'MemberExpression', memberExpr('Option', 'getOrElse'))
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('Option', 'getOrElse')
+			)
 		).toHaveLength(0);
 	});
 	it('allows Option.match', () => {
 		expect(
-			runRule(rule, 'MemberExpression', memberExpr('Option', 'match'))
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('Option', 'match')
+			)
 		).toHaveLength(0);
 	});
 });

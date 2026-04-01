@@ -1,6 +1,8 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-import { isCallOfMember } from '../utils.ts';
+import * as Effect from 'effect/Effect';
+
+import { AST, Diagnostic, Rule, RuleContext } from 'effect-oxlint';
 
 /**
  * Effect APIs that accept a Duration or numeric milliseconds where
@@ -23,36 +25,50 @@ const DURATION_APIS: ReadonlyArray<readonly [string, string]> = [
 	['Schedule', 'union']
 ];
 
-const rule: CreateRule = {
-	meta: {
+export default Rule.define({
+	name: 'prefer-duration-constructors',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Prefer Duration constructors over raw numeric literals for time values (EF-16)'
-		}
-	},
-	create(context) {
+		description:
+			'Prefer Duration constructors over raw numeric literals for time values (EF-16)'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
 		return {
-			CallExpression(node) {
-				for (const [obj, prop] of DURATION_APIS) {
-					if (!isCallOfMember(node, obj, prop)) continue;
+			CallExpression: (node: ESTree.Node) => {
+				const call = node as ESTree.CallExpression;
 
-					// Check first argument (or second for timeoutOrElse-style APIs)
-					for (const arg of node.arguments) {
-						if (
-							arg.type === 'Literal' &&
-							typeof arg.value === 'number'
-						) {
-							context.report({
-								node: arg,
-								message: `Use \`Duration.millis(${arg.value})\` or \`Duration.seconds(...)\` instead of a raw numeric literal. Duration constructors are self-documenting and prevent unit confusion. (EF-16)`
-							});
-						}
+				let matched = false;
+				for (const [obj, prop] of DURATION_APIS) {
+					if (AST.isCallOf(call, obj, prop)) {
+						matched = true;
+						break;
 					}
 				}
-			}
-		} satisfies Visitor;
-	}
-};
+				if (!matched) return Effect.void;
 
-export default rule;
+				// Check all arguments for numeric literals and report each
+				const reports: Array<Effect.Effect<void, never, RuleContext>> =
+					[];
+				for (const arg of call.arguments) {
+					if (
+						arg.type === 'Literal' &&
+						typeof arg.value === 'number'
+					) {
+						reports.push(
+							ctx.report(
+								Diagnostic.make({
+									node: arg,
+									message: `Use \`Duration.millis(${arg.value})\` or \`Duration.seconds(...)\` instead of a raw numeric literal. Duration constructors are self-documenting and prevent unit confusion. (EF-16)`
+								})
+							)
+						);
+					}
+				}
+
+				if (reports.length === 0) return Effect.void;
+				return Effect.all(reports, { discard: true });
+			}
+		};
+	}
+});

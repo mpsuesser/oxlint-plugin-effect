@@ -1,13 +1,6 @@
-import { memberExprRule } from '../utils.ts';
+import { Rule } from 'effect-oxlint';
 
-export default memberExprRule(
-	'Prefer Schema.Class over Schema.Struct for domain models',
-	[
-		{
-			obj: 'Schema',
-			prop: 'Struct',
-			message:
-				'Prefer `Schema.Class` over `Schema.Struct` for domain models. Schema.Class provides a named constructor, instanceof checks, and cleaner type derivation. (EF-33)'
-		}
-	]
-);
+export default Rule.banMember('Schema', 'Struct', {
+	message:
+		'Prefer `Schema.Class` over `Schema.Struct` for named schema types with instance methods. `Schema.Class` provides constructor, `$is`, `$match`, and type branding. (EF-8)'
+});

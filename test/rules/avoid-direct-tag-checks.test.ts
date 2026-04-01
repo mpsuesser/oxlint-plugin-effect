@@ -1,33 +1,33 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-direct-tag-checks.ts';
-import { binaryExpr, memberExpr, runRule, strLiteral } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('avoid-direct-tag-checks', () => {
 	it("flags x._tag === 'Foo'", () => {
-		const node = binaryExpr(
+		const node = Testing.binaryExpr(
 			'===',
-			{ ...memberExpr('x', '_tag'), type: 'MemberExpression' },
-			strLiteral('Foo')
+			{ ...Testing.memberExpr('x', '_tag'), type: 'MemberExpression' },
+			Testing.strLiteral('Foo')
 		);
-		expect(runRule(rule, 'BinaryExpression', node)).toHaveLength(1);
+		expect(Testing.runRule(rule, 'BinaryExpression', node)).toHaveLength(1);
 	});
 
 	it("flags x._tag !== 'Foo'", () => {
-		const node = binaryExpr(
+		const node = Testing.binaryExpr(
 			'!==',
-			{ ...memberExpr('x', '_tag'), type: 'MemberExpression' },
-			strLiteral('Foo')
+			{ ...Testing.memberExpr('x', '_tag'), type: 'MemberExpression' },
+			Testing.strLiteral('Foo')
 		);
-		expect(runRule(rule, 'BinaryExpression', node)).toHaveLength(1);
+		expect(Testing.runRule(rule, 'BinaryExpression', node)).toHaveLength(1);
 	});
 
 	it("allows x.type === 'Foo'", () => {
-		const node = binaryExpr(
+		const node = Testing.binaryExpr(
 			'===',
-			{ ...memberExpr('x', 'type'), type: 'MemberExpression' },
-			strLiteral('Foo')
+			{ ...Testing.memberExpr('x', 'type'), type: 'MemberExpression' },
+			Testing.strLiteral('Foo')
 		);
-		expect(runRule(rule, 'BinaryExpression', node)).toHaveLength(0);
+		expect(Testing.runRule(rule, 'BinaryExpression', node)).toHaveLength(0);
 	});
 });

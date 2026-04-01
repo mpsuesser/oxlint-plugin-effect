@@ -1,67 +1,86 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-import { isMemberExpr } from '../utils.ts';
+import * as Effect from 'effect/Effect';
 
-const rule: CreateRule = {
-	meta: {
+import { AST, Diagnostic, Rule, RuleContext, Visitor } from 'effect-oxlint';
+
+export default Rule.define({
+	name: 'avoid-native-object-helpers',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Disallow native Object.keys/values/entries and new Map/Set — use Effect modules (EF-5)'
-		}
-	},
-	create(context) {
-		return {
-			MemberExpression(node) {
-				if (isMemberExpr(node, 'Object', 'keys')) {
-					context.report({
-						node,
-						message:
-							'Use `R.keys(obj)` from `effect/Record` instead of `Object.keys(...)`. Effect Record helpers are type-safe and composable. (EF-5)'
-					});
+		description:
+			'Disallow native Object.keys/values/entries and new Map/Set — use Effect modules (EF-5)'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
+
+		return Visitor.merge(
+			Visitor.on('MemberExpression', (node) => {
+				const member = node as ESTree.MemberExpression;
+				if (AST.isMember(member, 'Object', 'keys')) {
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Use `R.keys(obj)` from `effect/Record` instead of `Object.keys(...)`. Effect Record helpers are type-safe and composable. (EF-5)'
+						})
+					);
 				}
-				if (isMemberExpr(node, 'Object', 'values')) {
-					context.report({
-						node,
-						message:
-							'Use `R.values(obj)` from `effect/Record` instead of `Object.values(...)`. Effect Record helpers are type-safe and composable. (EF-5)'
-					});
+				if (AST.isMember(member, 'Object', 'values')) {
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Use `R.values(obj)` from `effect/Record` instead of `Object.values(...)`. Effect Record helpers are type-safe and composable. (EF-5)'
+						})
+					);
 				}
-				if (isMemberExpr(node, 'Object', 'entries')) {
-					context.report({
-						node,
-						message:
-							'Use `R.toEntries(obj)` from `effect/Record` instead of `Object.entries(...)`. Effect Record helpers are type-safe and composable. (EF-5)'
-					});
+				if (AST.isMember(member, 'Object', 'entries')) {
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Use `R.toEntries(obj)` from `effect/Record` instead of `Object.entries(...)`. Effect Record helpers are type-safe and composable. (EF-5)'
+						})
+					);
 				}
-				if (isMemberExpr(node, 'Object', 'fromEntries')) {
-					context.report({
-						node,
-						message:
-							'Use `R.fromEntries(entries)` from `effect/Record` instead of `Object.fromEntries(...)`. Effect Record helpers are type-safe and composable. (EF-5)'
-					});
+				if (AST.isMember(member, 'Object', 'fromEntries')) {
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Use `R.fromEntries(entries)` from `effect/Record` instead of `Object.fromEntries(...)`. Effect Record helpers are type-safe and composable. (EF-5)'
+						})
+					);
 				}
-			},
-			NewExpression(node) {
-				if (node.callee.type !== 'Identifier') return;
-				const name = node.callee.name;
+				return Effect.void;
+			}),
+			Visitor.on('NewExpression', (node) => {
+				const newExpr = node as ESTree.NewExpression;
+				if (newExpr.callee.type !== 'Identifier') {
+					return Effect.void;
+				}
+				const name = newExpr.callee.name;
 				if (name === 'Map') {
-					context.report({
-						node,
-						message:
-							'Use `HashMap` from `effect/HashMap` instead of native `Map`. HashMap provides structural equality and immutability. (EF-5)'
-					});
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Use `HashMap` from `effect/HashMap` instead of native `Map`. HashMap provides structural equality and immutability. (EF-5)'
+						})
+					);
 				}
 				if (name === 'Set') {
-					context.report({
-						node,
-						message:
-							'Use `HashSet` from `effect/HashSet` instead of native `Set`. HashSet provides structural equality and immutability. (EF-5)'
-					});
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Use `HashSet` from `effect/HashSet` instead of native `Set`. HashSet provides structural equality and immutability. (EF-5)'
+						})
+					);
 				}
-			}
-		} satisfies Visitor;
+				return Effect.void;
+			})
+		);
 	}
-};
-
-export default rule;
+});

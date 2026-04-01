@@ -1,36 +1,56 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/casting-awareness.ts';
-import { runRule, tsAsExpr } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('casting-awareness', () => {
 	it('flags as string (non-const cast)', () => {
 		expect(
-			runRule(rule, 'TSAsExpression', tsAsExpr('TSStringKeyword'))
+			Testing.runRule(
+				rule,
+				'TSAsExpression',
+				Testing.tsAsExpr('TSStringKeyword')
+			)
 		).toHaveLength(1);
 	});
 
 	it('flags as number', () => {
 		expect(
-			runRule(rule, 'TSAsExpression', tsAsExpr('TSNumberKeyword'))
+			Testing.runRule(
+				rule,
+				'TSAsExpression',
+				Testing.tsAsExpr('TSNumberKeyword')
+			)
 		).toHaveLength(1);
 	});
 
 	it('skips as any (handled by avoid-any)', () => {
 		expect(
-			runRule(rule, 'TSAsExpression', tsAsExpr('TSAnyKeyword'))
+			Testing.runRule(
+				rule,
+				'TSAsExpression',
+				Testing.tsAsExpr('TSAnyKeyword')
+			)
 		).toHaveLength(0);
 	});
 
 	it('skips as unknown (handled by avoid-any)', () => {
 		expect(
-			runRule(rule, 'TSAsExpression', tsAsExpr('TSUnknownKeyword'))
+			Testing.runRule(
+				rule,
+				'TSAsExpression',
+				Testing.tsAsExpr('TSUnknownKeyword')
+			)
 		).toHaveLength(0);
 	});
 
 	it('skips as never (exhaustive check pattern)', () => {
 		expect(
-			runRule(rule, 'TSAsExpression', tsAsExpr('TSNeverKeyword'))
+			Testing.runRule(
+				rule,
+				'TSAsExpression',
+				Testing.tsAsExpr('TSNeverKeyword')
+			)
 		).toHaveLength(0);
 	});
 
@@ -44,12 +64,16 @@ describe('casting-awareness', () => {
 			},
 			parent: { type: 'ExpressionStatement' }
 		};
-		expect(runRule(rule, 'TSAsExpression', node)).toHaveLength(0);
+		expect(Testing.runRule(rule, 'TSAsExpression', node)).toHaveLength(0);
 	});
 
 	it('skips as const (TSLiteralType)', () => {
 		expect(
-			runRule(rule, 'TSAsExpression', tsAsExpr('TSLiteralType'))
+			Testing.runRule(
+				rule,
+				'TSAsExpression',
+				Testing.tsAsExpr('TSLiteralType')
+			)
 		).toHaveLength(0);
 	});
 });

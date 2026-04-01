@@ -1,37 +1,57 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-react-hooks.ts';
-import { callExpr, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('avoid-react-hooks', () => {
 	it('flags useState', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('useState'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callExpr('useState')
+			)
 		).toHaveLength(1);
 	});
 	it('flags useEffect', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('useEffect'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callExpr('useEffect')
+			)
 		).toHaveLength(1);
 	});
 	it('flags useCallback', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('useCallback'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callExpr('useCallback')
+			)
 		).toHaveLength(1);
 	});
 	it('flags useMemo', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('useMemo'))
+			Testing.runRule(rule, 'CallExpression', Testing.callExpr('useMemo'))
 		).toHaveLength(1);
 	});
 	it('allows useAtomValue (custom hook)', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('useAtomValue'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callExpr('useAtomValue')
+			)
 		).toHaveLength(0);
 	});
 	it('allows custom hooks not in the list', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('useCustomHook'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callExpr('useCustomHook')
+			)
 		).toHaveLength(0);
 	});
 });

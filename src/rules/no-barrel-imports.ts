@@ -1,4 +1,8 @@
-import type { CreateRule, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
+
+import * as Effect from 'effect/Effect';
+
+import { Diagnostic, Rule, RuleContext } from 'effect-oxlint';
 
 /**
  * Packages where barrel imports (named imports from package root) should
@@ -6,26 +10,26 @@ import type { CreateRule, Visitor } from '@oxlint/plugins';
  */
 const BARREL_PACKAGES = new Set(['effect']);
 
-const rule: CreateRule = {
-	meta: {
+export default Rule.define({
+	name: 'no-barrel-imports',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Disallow named imports from barrel packages — use submodule namespace imports instead'
-		}
-	},
-	create(context) {
+		description:
+			'Disallow named imports from barrel packages — use submodule namespace imports instead'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
 		return {
-			ImportDeclaration(node) {
-				const src = node.source.value;
-				if (!BARREL_PACKAGES.has(src)) return;
+			ImportDeclaration: (node: ESTree.Node) => {
+				const decl = node as ESTree.ImportDeclaration;
+				const src = decl.source.value;
+				if (!BARREL_PACKAGES.has(src)) return Effect.void;
 
 				// Skip type-only import declarations
-				if (node.importKind === 'type') return;
+				if (decl.importKind === 'type') return Effect.void;
 
-				// Flag named imports (ImportSpecifier), not namespace (ImportNamespaceSpecifier)
-				// or default (ImportDefaultSpecifier)
-				for (const specifier of node.specifiers) {
+				// Flag named imports (ImportSpecifier), not namespace or default
+				for (const specifier of decl.specifiers) {
 					if (specifier.type !== 'ImportSpecifier') continue;
 
 					// Skip type-only specifiers within a value import
@@ -35,16 +39,16 @@ const rule: CreateRule = {
 					if (!imported || imported.type !== 'Identifier') continue;
 
 					const name = imported.name;
-					context.report({
-						node,
-						message: `Prefer \`import * as ${name} from "${src}/${name}"\` over named import from barrel package "${src}". Barrel imports are slower and bypass tree-shaking.`
-					});
-					// Report once per declaration to avoid noise
-					return;
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message: `Prefer \`import * as ${name} from "${src}/${name}"\` over named import from barrel package "${src}". Barrel imports are slower and bypass tree-shaking.`
+						})
+					);
 				}
-			}
-		} satisfies Visitor;
-	}
-};
 
-export default rule;
+				return Effect.void;
+			}
+		};
+	}
+});

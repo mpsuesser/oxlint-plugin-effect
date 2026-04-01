@@ -3,9 +3,32 @@
   "name": "oxlint-effect",
   "version": "0.1.0",
   "description": "Oxlint JS plugin enforcing Effect-first development conventions",
+  "keywords": [
+    "effect",
+    "eslint",
+    "lint",
+    "linter",
+    "oxc",
+    "oxlint",
+    "plugin",
+    "rules",
+    "typescript"
+  ],
+  "homepage": "https://github.com/mpsuesser/oxlint-effect#readme",
+  "bugs": {
+    "url": "https://github.com/mpsuesser/oxlint-effect/issues"
+  },
   "license": "MIT",
+  "author": "Marc Suesser",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mpsuesser/oxlint-effect.git"
+  },
   "files": [
-    "src"
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "type": "module",
   "exports": {
@@ -17,13 +40,20 @@
   "scripts": {
     "build": "vp build",
     "check": "vp check --fix",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsgo",
+    "prepare": "effect-tsgo patch"
   },
   "dependencies": {
-    "@oxlint/plugins": "^1.57.0"
+    "@oxlint/plugins": "^1.57.0",
+    "effect": "4.0.0-beta.43",
+    "effect-oxlint": "link:effect-oxlint"
   },
   "devDependencies": {
+    "@effect/tsgo": "^0.1.1",
+    "@effect/vitest": "4.0.0-beta.43",
     "@types/bun": "^1.3.10",
+    "@typescript/native-preview": "^7.0.0-dev.20260401.1",
     "typescript": "^5.9.3",
     "vite-plus": "^0.1.14",
     "vitest": "^4.1.0"

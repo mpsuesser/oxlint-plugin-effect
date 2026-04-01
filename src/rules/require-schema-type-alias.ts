@@ -1,63 +1,12 @@
-import type { CreateRule, ESTree, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-const rule: CreateRule = {
-	meta: {
-		type: 'suggestion',
-		docs: {
-			description:
-				'Exported non-class schemas should have a matching type alias export (EF-3)'
-		}
-	},
-	create(context) {
-		// Track exported schema const names and exported type alias names
-		const exportedSchemaConsts = new Map<string, ESTree.BindingIdentifier>();
-		const exportedTypeAliases = new Set<string>();
+import * as Effect from 'effect/Effect';
+import * as Option from 'effect/Option';
 
-		return {
-			// Detect: export const Foo = Schema.*
-			ExportNamedDeclaration(node) {
-				const decl = node.declaration;
-				if (!decl) return;
-
-				// export type Foo = ...
-				if (decl.type === 'TSTypeAliasDeclaration') {
-					exportedTypeAliases.add(decl.id.name);
-					return;
-				}
-
-				// export const Foo = Schema.*
-				if (decl.type !== 'VariableDeclaration') return;
-
-				for (const declarator of decl.declarations) {
-					if (declarator.id.type !== 'Identifier') continue;
-					const name = declarator.id.name;
-					const init = declarator.init;
-					if (!init) continue;
-
-					// Check if init references Schema.* (but not Schema.Class which creates its own type)
-					const isSchemaRef = isSchemaReference(init);
-
-					if (isSchemaRef) {
-						exportedSchemaConsts.set(name, declarator.id as ESTree.BindingIdentifier);
-					}
-				}
-			},
-			'Program:exit'() {
-				for (const [name, node] of exportedSchemaConsts) {
-					if (!exportedTypeAliases.has(name)) {
-						context.report({
-							node,
-							message: `Exported schema constant \`${name}\` should have a matching \`export type ${name} = typeof ${name}.Type\`. Non-class schemas need explicit type alias exports. (EF-3)`
-						});
-					}
-				}
-			}
-		} satisfies Visitor;
-	}
-};
+import { Diagnostic, Rule, RuleContext, Visitor } from 'effect-oxlint';
 
 /** Check if an expression references Schema.* (member access or call). */
-function isSchemaReference(init: ESTree.Expression): boolean {
+const isSchemaReference = (init: ESTree.Expression): boolean => {
 	// Schema.String, Schema.Number, etc.
 	if (
 		init.type === 'MemberExpression' &&
@@ -83,6 +32,87 @@ function isSchemaReference(init: ESTree.Expression): boolean {
 	}
 
 	return false;
+};
+
+interface SchemaConst {
+	readonly name: string;
+	readonly node: ESTree.BindingIdentifier;
+	readonly isTypeAlias: boolean;
 }
 
-export default rule;
+export default Rule.define({
+	name: 'require-schema-type-alias',
+	meta: Rule.meta({
+		type: 'suggestion',
+		description:
+			'Exported non-class schemas should have a matching type alias export (EF-3)'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
+
+		return yield* Visitor.accumulate<SchemaConst>(
+			'ExportNamedDeclaration',
+			(node) => {
+				const exportNode = node as ESTree.ExportNamedDeclaration;
+				const decl = exportNode.declaration;
+				if (!decl) return Option.none();
+
+				// export type Foo = ...
+				if (decl.type === 'TSTypeAliasDeclaration') {
+					return Option.some({
+						name: decl.id.name,
+						node: decl.id as ESTree.BindingIdentifier,
+						isTypeAlias: true
+					});
+				}
+
+				// export const Foo = Schema.*
+				if (decl.type !== 'VariableDeclaration') return Option.none();
+
+				for (const declarator of decl.declarations) {
+					if (declarator.id.type !== 'Identifier') continue;
+					const name = declarator.id.name;
+					const init = declarator.init;
+					if (!init) continue;
+
+					if (isSchemaReference(init)) {
+						return Option.some({
+							name,
+							node: declarator.id as ESTree.BindingIdentifier,
+							isTypeAlias: false
+						});
+					}
+				}
+
+				return Option.none();
+			},
+			(items) =>
+				Effect.gen(function* () {
+					const schemaConsts = new Map<
+						string,
+						ESTree.BindingIdentifier
+					>();
+					const typeAliases = new Set<string>();
+
+					for (const item of items) {
+						if (item.isTypeAlias) {
+							typeAliases.add(item.name);
+						} else {
+							schemaConsts.set(item.name, item.node);
+						}
+					}
+
+					for (const [name, constNode] of schemaConsts) {
+						if (!typeAliases.has(name)) {
+							yield* ctx.report(
+								Diagnostic.make({
+									node: constNode as unknown as ESTree.Node,
+									message: `Exported schema constant \`${name}\` should have a matching \`export type ${name} = typeof ${name}.Type\`. Non-class schemas need explicit type alias exports. (EF-3)`
+								})
+							);
+						}
+					}
+				})
+		);
+	}
+});

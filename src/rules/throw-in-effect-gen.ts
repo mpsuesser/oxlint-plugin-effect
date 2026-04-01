@@ -1,94 +1,77 @@
-import type { CreateRule, ESTree, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-const rule: CreateRule = {
-	meta: {
+import * as Effect from 'effect/Effect';
+import * as Ref from 'effect/Ref';
+
+import { AST, Diagnostic, Rule, RuleContext, Visitor } from 'effect-oxlint';
+
+export default Rule.define({
+	name: 'throw-in-effect-gen',
+	meta: Rule.meta({
 		type: 'problem',
-		docs: {
-			description:
-				'Disallow throw statements inside Effect.gen — use yield* Effect.fail() instead'
-		}
-	},
-	create(context) {
-		let effectGenDepth = 0;
-		let tryPropertyDepth = 0;
-
-		/** Check if a CallExpression is `Effect.gen(...)` */
-		function isEffectGenCall(node: ESTree.CallExpression): boolean {
-			return (
-				node.callee.type === 'MemberExpression' &&
-				node.callee.object.type === 'Identifier' &&
-				node.callee.object.name === 'Effect' &&
-				node.callee.property.type === 'Identifier' &&
-				node.callee.property.name === 'gen'
-			);
-		}
-
-		/** Check if a CallExpression is `Effect.tryPromise(...)` or `Effect.try(...)` */
-		function isEffectTryCall(node: ESTree.CallExpression): boolean {
-			return (
-				node.callee.type === 'MemberExpression' &&
-				node.callee.object.type === 'Identifier' &&
-				node.callee.object.name === 'Effect' &&
-				node.callee.property.type === 'Identifier' &&
-				(node.callee.property.name === 'tryPromise' ||
-					node.callee.property.name === 'try')
-			);
-		}
+		description:
+			'Disallow throw statements inside Effect.gen — use yield* Effect.fail() instead'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
+		const effectGenDepth = yield* Ref.make(0);
+		const tryPropertyDepth = yield* Ref.make(0);
 
 		/**
-		 * Check if an ObjectProperty is the `try` key inside an Effect.tryPromise
-		 * or Effect.try call. Structure: Effect.tryPromise({ try: ..., catch: ... })
+		 * Check if a Property node is the `try` key inside
+		 * Effect.tryPromise({ try: ..., catch: ... }) or Effect.try({ try: ... }).
 		 */
-		function isTryPropertyOfEffectTry(
-			node: ESTree.ObjectProperty
-		): boolean {
-			if (node.key.type !== 'Identifier' || node.key.name !== 'try')
+		const isTryPropertyOfEffectTry = (node: ESTree.Node): boolean => {
+			const prop = node as unknown as ESTree.ObjectProperty;
+			if (prop.key.type !== 'Identifier' || prop.key.name !== 'try') {
 				return false;
-
-			// Walk up: ObjectProperty -> ObjectExpression -> CallExpression
-			const { parent } = node;
-			if (parent?.type !== 'ObjectExpression') return false;
-
-			const grandparent = parent.parent;
-			if (grandparent?.type !== 'CallExpression') return false;
-
-			return isEffectTryCall(grandparent);
-		}
-
-		return {
-			CallExpression(node) {
-				if (isEffectGenCall(node)) {
-					effectGenDepth++;
-				}
-			},
-			'CallExpression:exit'(node: ESTree.CallExpression) {
-				if (isEffectGenCall(node)) {
-					effectGenDepth--;
-				}
-			},
-
-			Property(node: ESTree.ObjectProperty) {
-				if (isTryPropertyOfEffectTry(node)) {
-					tryPropertyDepth++;
-				}
-			},
-			'Property:exit'(node: ESTree.ObjectProperty) {
-				if (isTryPropertyOfEffectTry(node)) {
-					tryPropertyDepth--;
-				}
-			},
-
-			ThrowStatement(node) {
-				if (effectGenDepth > 0 && tryPropertyDepth === 0) {
-					context.report({
-						node,
-						message:
-							'Do not throw inside `Effect.gen`. Use `yield* Effect.fail(new MyError(...))` to keep errors in the typed channel. (EF-1)'
-					});
-				}
 			}
-		} satisfies Visitor;
-	}
-};
+			const parent = (prop as unknown as { parent?: ESTree.Node }).parent;
+			if (parent?.type !== 'ObjectExpression') return false;
+			const grandparent = (parent as unknown as { parent?: ESTree.Node })
+				.parent;
+			if (grandparent?.type !== 'CallExpression') return false;
+			const call = grandparent as ESTree.CallExpression;
+			return (
+				AST.isCallOf(call, 'Effect', 'tryPromise') ||
+				AST.isCallOf(call, 'Effect', 'try')
+			);
+		};
 
-export default rule;
+		return Visitor.merge(
+			Visitor.tracked(
+				'CallExpression',
+				(node) => {
+					const call = node as ESTree.CallExpression;
+					return AST.isCallOf(call, 'Effect', 'gen');
+				},
+				effectGenDepth
+			),
+			{
+				Property: (node: ESTree.Node) =>
+					isTryPropertyOfEffectTry(node)
+						? Ref.update(tryPropertyDepth, (n) => n + 1)
+						: Effect.void,
+				'Property:exit': (node: ESTree.Node) =>
+					isTryPropertyOfEffectTry(node)
+						? Ref.update(tryPropertyDepth, (n) => n - 1)
+						: Effect.void
+			},
+			Visitor.on('ThrowStatement', (node) =>
+				Effect.gen(function* () {
+					const genDepth = yield* Ref.get(effectGenDepth);
+					const tryDepth = yield* Ref.get(tryPropertyDepth);
+					if (genDepth > 0 && tryDepth === 0) {
+						yield* ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'Do not throw inside `Effect.gen`. Use `yield* Effect.fail(new MyError(...))` to keep errors in the typed channel. (EF-1)'
+							})
+						);
+					}
+				})
+			)
+		);
+	}
+});

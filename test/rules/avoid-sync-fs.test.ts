@@ -1,32 +1,52 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-sync-fs.ts';
-import { callExpr, callOfMember, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('avoid-sync-fs', () => {
 	it('flags readFileSync()', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('readFileSync'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callExpr('readFileSync')
+			)
 		).toHaveLength(1);
 	});
 	it('flags writeFileSync()', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('writeFileSync'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callExpr('writeFileSync')
+			)
 		).toHaveLength(1);
 	});
 	it('flags existsSync()', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('existsSync'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callExpr('existsSync')
+			)
 		).toHaveLength(1);
 	});
 	it('flags fs.readFileSync()', () => {
 		expect(
-			runRule(rule, 'CallExpression', callOfMember('fs', 'readFileSync'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callOfMember('fs', 'readFileSync')
+			)
 		).toHaveLength(1);
 	});
 	it('allows readFile()', () => {
 		expect(
-			runRule(rule, 'CallExpression', callExpr('readFile'))
+			Testing.runRule(
+				rule,
+				'CallExpression',
+				Testing.callExpr('readFile')
+			)
 		).toHaveLength(0);
 	});
 });

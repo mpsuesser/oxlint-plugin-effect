@@ -1,27 +1,29 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/throw-in-effect-gen.ts';
-import { callOfMember, runRuleMulti, throwStmt } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('throw-in-effect-gen', () => {
 	it('flags throw inside Effect.gen', () => {
-		const effectGen = callOfMember('Effect', 'gen');
-		const errors = runRuleMulti(rule, [
+		const effectGen = Testing.callOfMember('Effect', 'gen');
+		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', effectGen],
-			['ThrowStatement', throwStmt()],
+			['ThrowStatement', Testing.throwStmt()],
 			['CallExpression:exit', effectGen]
 		]);
 		expect(errors).toHaveLength(1);
 	});
 
 	it('allows throw outside Effect.gen', () => {
-		const errors = runRuleMulti(rule, [['ThrowStatement', throwStmt()]]);
+		const errors = Testing.runRuleMulti(rule, [
+			['ThrowStatement', Testing.throwStmt()]
+		]);
 		expect(errors).toHaveLength(0);
 	});
 
 	it('allows throw inside Effect.tryPromise try block', () => {
-		const effectGen = callOfMember('Effect', 'gen');
-		const tryPromise = callOfMember('Effect', 'tryPromise');
+		const effectGen = Testing.callOfMember('Effect', 'gen');
+		const tryPromise = Testing.callOfMember('Effect', 'tryPromise');
 		const tryProp = {
 			type: 'ObjectProperty',
 			key: { type: 'Identifier', name: 'try' },
@@ -30,10 +32,10 @@ describe('throw-in-effect-gen', () => {
 				parent: tryPromise
 			}
 		};
-		const errors = runRuleMulti(rule, [
+		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', effectGen],
 			['Property', tryProp],
-			['ThrowStatement', throwStmt()],
+			['ThrowStatement', Testing.throwStmt()],
 			['Property:exit', tryProp],
 			['CallExpression:exit', effectGen]
 		]);
@@ -41,8 +43,8 @@ describe('throw-in-effect-gen', () => {
 	});
 
 	it('allows throw inside Effect.try try block', () => {
-		const effectGen = callOfMember('Effect', 'gen');
-		const effectTry = callOfMember('Effect', 'try');
+		const effectGen = Testing.callOfMember('Effect', 'gen');
+		const effectTry = Testing.callOfMember('Effect', 'try');
 		const tryProp = {
 			type: 'ObjectProperty',
 			key: { type: 'Identifier', name: 'try' },
@@ -51,10 +53,10 @@ describe('throw-in-effect-gen', () => {
 				parent: effectTry
 			}
 		};
-		const errors = runRuleMulti(rule, [
+		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', effectGen],
 			['Property', tryProp],
-			['ThrowStatement', throwStmt()],
+			['ThrowStatement', Testing.throwStmt()],
 			['Property:exit', tryProp],
 			['CallExpression:exit', effectGen]
 		]);
@@ -63,12 +65,12 @@ describe('throw-in-effect-gen', () => {
 
 	// ── Nested depth tests ──
 	it('flags throw inside nested Effect.gen (depth > 1)', () => {
-		const effectGen = callOfMember('Effect', 'gen');
-		const innerGen = callOfMember('Effect', 'gen');
-		const errors = runRuleMulti(rule, [
+		const effectGen = Testing.callOfMember('Effect', 'gen');
+		const innerGen = Testing.callOfMember('Effect', 'gen');
+		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', effectGen],
 			['CallExpression', innerGen],
-			['ThrowStatement', throwStmt()],
+			['ThrowStatement', Testing.throwStmt()],
 			['CallExpression:exit', innerGen],
 			['CallExpression:exit', effectGen]
 		]);
@@ -76,11 +78,11 @@ describe('throw-in-effect-gen', () => {
 	});
 
 	it('does not flag throw after Effect.gen exits (counter reset)', () => {
-		const effectGen = callOfMember('Effect', 'gen');
-		const errors = runRuleMulti(rule, [
+		const effectGen = Testing.callOfMember('Effect', 'gen');
+		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', effectGen],
 			['CallExpression:exit', effectGen],
-			['ThrowStatement', throwStmt()]
+			['ThrowStatement', Testing.throwStmt()]
 		]);
 		expect(errors).toHaveLength(0);
 	});

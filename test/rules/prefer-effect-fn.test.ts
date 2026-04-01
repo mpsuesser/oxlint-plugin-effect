@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/prefer-effect-fn.ts';
-import { callOfMember, runRuleMulti } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('prefer-effect-fn', () => {
 	it('flags Effect.gen inside ServiceMap.Service definition', () => {
-		const serviceInner = callOfMember('ServiceMap', 'Service');
+		const serviceInner = Testing.callOfMember('ServiceMap', 'Service');
 		const serviceOuter = {
 			type: 'CallExpression',
 			callee: serviceInner,
 			arguments: [{ type: 'Literal', value: '@app/Foo' }]
 		};
-		const effectGen = callOfMember('Effect', 'gen');
+		const effectGen = Testing.callOfMember('Effect', 'gen');
 
-		const errors = runRuleMulti(rule, [
+		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', serviceOuter],
 			['CallExpression', effectGen],
 			['CallExpression:exit', effectGen],
@@ -23,8 +23,8 @@ describe('prefer-effect-fn', () => {
 	});
 
 	it('allows Effect.gen outside ServiceMap.Service', () => {
-		const effectGen = callOfMember('Effect', 'gen');
-		const errors = runRuleMulti(rule, [
+		const effectGen = Testing.callOfMember('Effect', 'gen');
+		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', effectGen],
 			['CallExpression:exit', effectGen]
 		]);
@@ -32,16 +32,16 @@ describe('prefer-effect-fn', () => {
 	});
 
 	it('allows Effect.fn inside ServiceMap.Service', () => {
-		const serviceInner = callOfMember('ServiceMap', 'Service');
+		const serviceInner = Testing.callOfMember('ServiceMap', 'Service');
 		const serviceOuter = {
 			type: 'CallExpression',
 			callee: serviceInner,
 			arguments: [{ type: 'Literal', value: '@app/Foo' }]
 		};
-		const effectFn = callOfMember('Effect', 'fn');
-		const effectGen = callOfMember('Effect', 'gen');
+		const effectFn = Testing.callOfMember('Effect', 'fn');
+		const effectGen = Testing.callOfMember('Effect', 'gen');
 
-		const errors = runRuleMulti(rule, [
+		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', serviceOuter],
 			['CallExpression', effectFn],
 			['CallExpression', effectGen],
@@ -53,16 +53,16 @@ describe('prefer-effect-fn', () => {
 	});
 
 	it('allows Effect.fnUntraced inside ServiceMap.Service', () => {
-		const serviceInner = callOfMember('ServiceMap', 'Service');
+		const serviceInner = Testing.callOfMember('ServiceMap', 'Service');
 		const serviceOuter = {
 			type: 'CallExpression',
 			callee: serviceInner,
 			arguments: [{ type: 'Literal', value: '@app/Foo' }]
 		};
-		const effectFnUntraced = callOfMember('Effect', 'fnUntraced');
-		const effectGen = callOfMember('Effect', 'gen');
+		const effectFnUntraced = Testing.callOfMember('Effect', 'fnUntraced');
+		const effectGen = Testing.callOfMember('Effect', 'gen');
 
-		const errors = runRuleMulti(rule, [
+		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', serviceOuter],
 			['CallExpression', effectFnUntraced],
 			['CallExpression', effectGen],

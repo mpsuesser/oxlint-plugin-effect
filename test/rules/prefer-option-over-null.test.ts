@@ -1,49 +1,49 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/prefer-option-over-null.ts';
-import { runRule, tsUnionType } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('prefer-option-over-null', () => {
 	it('flags T | null union', () => {
-		const errors = runRule(
+		const errors = Testing.runRule(
 			rule,
 			'TSUnionType',
-			tsUnionType(['TSStringKeyword', 'TSNullKeyword'])
+			Testing.tsUnionType(['TSStringKeyword', 'TSNullKeyword'])
 		);
 		expect(errors).toHaveLength(1);
-		expect(errors[0]?.message).toContain('T | null');
+		expect(errors[0]?.diagnostic.message).toContain('T | null');
 	});
 
 	it('flags T | undefined union', () => {
-		const errors = runRule(
+		const errors = Testing.runRule(
 			rule,
 			'TSUnionType',
-			tsUnionType(['TSStringKeyword', 'TSUndefinedKeyword'])
+			Testing.tsUnionType(['TSStringKeyword', 'TSUndefinedKeyword'])
 		);
 		expect(errors).toHaveLength(1);
-		expect(errors[0]?.message).toContain('T | undefined');
+		expect(errors[0]?.diagnostic.message).toContain('T | undefined');
 	});
 
 	it('flags T | null | undefined union with combined message', () => {
-		const errors = runRule(
+		const errors = Testing.runRule(
 			rule,
 			'TSUnionType',
-			tsUnionType([
+			Testing.tsUnionType([
 				'TSStringKeyword',
 				'TSNullKeyword',
 				'TSUndefinedKeyword'
 			])
 		);
 		expect(errors).toHaveLength(1);
-		expect(errors[0]?.message).toContain('T | null | undefined');
+		expect(errors[0]?.diagnostic.message).toContain('T | null | undefined');
 	});
 
 	it('allows string | number union', () => {
 		expect(
-			runRule(
+			Testing.runRule(
 				rule,
 				'TSUnionType',
-				tsUnionType(['TSStringKeyword', 'TSNumberKeyword'])
+				Testing.tsUnionType(['TSStringKeyword', 'TSNumberKeyword'])
 			)
 		).toHaveLength(0);
 	});

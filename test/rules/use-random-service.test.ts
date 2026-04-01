@@ -1,22 +1,34 @@
 import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/use-random-service.ts';
-import { memberExpr, runRule } from '../utils.ts';
+import { Testing } from 'effect-oxlint';
 
 describe('use-random-service', () => {
 	it('flags Math.random', () => {
 		expect(
-			runRule(rule, 'MemberExpression', memberExpr('Math', 'random'))
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('Math', 'random')
+			)
 		).toHaveLength(1);
 	});
 	it('allows Math.floor', () => {
 		expect(
-			runRule(rule, 'MemberExpression', memberExpr('Math', 'floor'))
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('Math', 'floor')
+			)
 		).toHaveLength(0);
 	});
 	it('allows Random.next', () => {
 		expect(
-			runRule(rule, 'MemberExpression', memberExpr('Random', 'next'))
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('Random', 'next')
+			)
 		).toHaveLength(0);
 	});
 });

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Test fixture: all three rules should report violations on this file.
  *
@@ -12,20 +13,25 @@
  *   - throw inside tryPromise try    — line 52
  */
 
+// Intentional undeclared globals — this file is a violation fixture, not real code.
+declare const Context: any;
+declare const Effect: any;
+declare const ServiceMap: any;
+
 // ── Rule 1: avoid-try-catch ──────────────────────────────────
 // Should trigger: TryStatement
 function riskyOperation() {
 	try {
 		return JSON.parse('{}');
-	} catch (_e) {
+	} catch {
 		return null;
 	}
 }
 
 // ── Rule 2: use-servicemap-service ───────────────────────────
 // Should trigger: Context.Tag and Effect.Service
-const _tag1 = Context.Tag<string>();
-const _tag2 = Effect.Service<string>();
+const _tag1 = Context.Tag();
+const _tag2 = Effect.Service();
 
 // Correct usage — should NOT trigger
 const _tag3 = ServiceMap.Service;
@@ -51,7 +57,7 @@ const _ok = Effect.gen(function* () {
 		try: () => {
 			throw new Error('caught by tryPromise'); // ACCEPTABLE
 		},
-		catch: (e) => new Error(String(e))
+		catch: (e: unknown) => new Error(String(e))
 	});
 });
 

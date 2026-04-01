@@ -1,33 +1,35 @@
-import type { CreateRule, ESTree, Visitor } from '@oxlint/plugins';
+import type { ESTree } from 'effect-oxlint';
 
-const rule: CreateRule = {
-	meta: {
+import * as Effect from 'effect/Effect';
+
+import { Diagnostic, Rule, RuleContext } from 'effect-oxlint';
+
+const isLengthAccess = (
+	n: ESTree.Expression | ESTree.PrivateIdentifier
+): boolean =>
+	n.type === 'MemberExpression' &&
+	n.property.type === 'Identifier' &&
+	n.property.name === 'length';
+
+const isZero = (n: ESTree.Expression | ESTree.PrivateIdentifier): boolean =>
+	n.type === 'Literal' && n.value === 0;
+
+const isOne = (n: ESTree.Expression | ESTree.PrivateIdentifier): boolean =>
+	n.type === 'Literal' && n.value === 1;
+
+export default Rule.define({
+	name: 'prefer-arr-match',
+	meta: Rule.meta({
 		type: 'suggestion',
-		docs: {
-			description:
-				'Prefer Arr.match for empty/non-empty array branching (EF-7)'
-		}
-	},
-	create(context) {
+		description:
+			'Prefer Arr.match for empty/non-empty array branching (EF-7)'
+	}),
+	create: function* () {
+		const ctx = yield* RuleContext;
 		return {
-			BinaryExpression(node) {
-				// Match: x.length === 0, x.length !== 0, x.length > 0, x.length < 1
-				const { left, right, operator } = node;
-
-				const isLengthAccess = (
-					n: ESTree.Expression | ESTree.PrivateIdentifier
-				): boolean =>
-					n.type === 'MemberExpression' &&
-					n.property.type === 'Identifier' &&
-					n.property.name === 'length';
-
-				const isZero = (
-					n: ESTree.Expression | ESTree.PrivateIdentifier
-				): boolean => n.type === 'Literal' && n.value === 0;
-
-				const isOne = (
-					n: ESTree.Expression | ESTree.PrivateIdentifier
-				): boolean => n.type === 'Literal' && n.value === 1;
+			BinaryExpression: (node: ESTree.Node) => {
+				const bin = node as ESTree.BinaryExpression;
+				const { left, right, operator } = bin;
 
 				// x.length === 0  |  x.length !== 0  |  x.length > 0  |  x.length >= 1  |  0 === x.length
 				const match =
@@ -53,15 +55,17 @@ const rule: CreateRule = {
 						(operator === '<=' || operator === '>'));
 
 				if (match) {
-					context.report({
-						node,
-						message:
-							'Use `Arr.match(array, { onEmpty: () => ..., onNonEmpty: (values) => ... })` instead of manual length checks for empty/non-empty branching. (EF-7)'
-					});
+					return ctx.report(
+						Diagnostic.make({
+							node,
+							message:
+								'Use `Arr.match(array, { onEmpty: () => ..., onNonEmpty: (values) => ... })` instead of manual length checks for empty/non-empty branching. (EF-7)'
+						})
+					);
 				}
-			}
-		} satisfies Visitor;
-	}
-};
 
-export default rule;
+				return Effect.void;
+			}
+		};
+	}
+});
