@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/vm-in-wrong-file.ts';
 import { id, interfaceDecl, runRule } from '../utils.ts';

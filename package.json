@@ -16,8 +16,8 @@
   },
   "scripts": {
     "build": "vp build",
-    "check": "vp check",
-    "test": "vp test"
+    "check": "vp check --fix",
+    "test": "vitest run"
   },
   "dependencies": {
     "@oxlint/plugins": "^1.57.0"
@@ -29,8 +29,7 @@
     "vitest": "^4.1.0"
   },
   "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.14",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.14"
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.14"
   },
   "packageManager": "bun@1.3.11"
 }

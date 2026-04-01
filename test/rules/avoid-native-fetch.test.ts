@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-native-fetch.ts';
 import { callExpr, callOfMember, runRule } from '../utils.ts';

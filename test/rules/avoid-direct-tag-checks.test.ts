@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-direct-tag-checks.ts';
 import { binaryExpr, memberExpr, runRule, strLiteral } from '../utils.ts';

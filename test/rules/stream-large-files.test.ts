@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/stream-large-files.ts';
 import { memberExpr, runRule } from '../utils.ts';

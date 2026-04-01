@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-react-hooks.ts';
 import { callExpr, runRule } from '../utils.ts';

@@ -1,3 +1,1 @@
-import { addEqualityTesters } from '@effect/vitest';
-
-addEqualityTesters();
+// vitest setup

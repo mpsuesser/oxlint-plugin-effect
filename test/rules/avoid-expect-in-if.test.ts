@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-expect-in-if.ts';
 import { callExpr, ifStmt, runRuleMulti } from '../utils.ts';

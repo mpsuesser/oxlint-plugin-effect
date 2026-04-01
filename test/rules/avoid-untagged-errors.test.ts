@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-untagged-errors.ts';
 import { binaryExpr, callExpr, id, newExpr, runRule } from '../utils.ts';

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/effect-promise-vs-trypromise.ts';
 import { memberExpr, runRule } from '../utils.ts';

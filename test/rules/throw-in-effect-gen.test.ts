@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/throw-in-effect-gen.ts';
 import { callOfMember, runRuleMulti, throwStmt } from '../utils.ts';

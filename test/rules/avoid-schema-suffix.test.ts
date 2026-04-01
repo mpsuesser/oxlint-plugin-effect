@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/avoid-schema-suffix.ts';
 import { callOfMember, memberExpr, runRule, varDeclarator } from '../utils.ts';

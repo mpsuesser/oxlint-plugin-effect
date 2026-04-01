@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/prefer-duration-constructors.ts';
 import { callOfMember, strLiteral, runRule } from '../utils.ts';

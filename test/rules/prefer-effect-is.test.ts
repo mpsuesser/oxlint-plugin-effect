@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/prefer-effect-is.ts';
 import { binaryExpr, strLiteral, unaryExpr, runRule } from '../utils.ts';

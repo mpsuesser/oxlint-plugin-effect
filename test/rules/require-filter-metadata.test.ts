@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it } from 'vitest';
 
 import rule from '../../src/rules/require-filter-metadata.ts';
 import { callOfMember, id, objectExpr, runRule } from '../utils.ts';
