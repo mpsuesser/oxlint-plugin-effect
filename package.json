@@ -1,0 +1,36 @@
+{
+  "$schema": "https://www.schemastore.org/package.json",
+  "name": "oxlint-effect",
+  "version": "0.1.0",
+  "description": "Oxlint JS plugin enforcing Effect-first development conventions",
+  "license": "MIT",
+  "files": [
+    "src"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts"
+    },
+    "./oxlint": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "vp build",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@oxlint/plugins": "^1.57.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.10",
+    "typescript": "^5.9.3",
+    "vite-plus": "^0.1.14",
+    "vitest": "^4.1.0"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.14",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.14"
+  },
+  "packageManager": "bun@1.3.11"
+}

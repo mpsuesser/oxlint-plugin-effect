@@ -1,0 +1,132 @@
+import avoidAny from './rules/avoid-any.ts';
+// ── Batch 1: MemberExpression rules ─────────────────────────
+import avoidDataTaggedError from './rules/avoid-data-tagged-error.ts';
+import avoidDirectJson from './rules/avoid-direct-json.ts';
+import avoidDirectTagChecks from './rules/avoid-direct-tag-checks.ts';
+import avoidExpectInIf from './rules/avoid-expect-in-if.ts';
+// ── Batch 2: Import source rules ────────────────────────────
+import avoidMutableState from './rules/avoid-mutable-state.ts';
+import avoidNativeFetch from './rules/avoid-native-fetch.ts';
+import avoidNativeObjectHelpers from './rules/avoid-native-object-helpers.ts';
+import avoidNodeImports from './rules/avoid-node-imports.ts';
+import avoidObjectType from './rules/avoid-object-type.ts';
+import avoidOptionGetorthrow from './rules/avoid-option-getorthrow.ts';
+import avoidPlatformCoupling from './rules/avoid-platform-coupling.ts';
+import avoidProcessEnv from './rules/avoid-process-env.ts';
+import avoidReactHooks from './rules/avoid-react-hooks.ts';
+import avoidSchemaSuffix from './rules/avoid-schema-suffix.ts';
+import avoidSyncFs from './rules/avoid-sync-fs.ts';
+// ── Batch 0: Original rules ──────────────────────────────────
+import avoidTryCatch from './rules/avoid-try-catch.ts';
+import avoidTsIgnore from './rules/avoid-ts-ignore.ts';
+import avoidUntaggedErrors from './rules/avoid-untagged-errors.ts';
+import avoidYieldRef from './rules/avoid-yield-ref.ts';
+import castingAwareness from './rules/casting-awareness.ts';
+import contextTagExtends from './rules/context-tag-extends.ts';
+import effectCatchallDefault from './rules/effect-catchall-default.ts';
+import effectPromiseVsTrypromise from './rules/effect-promise-vs-trypromise.ts';
+import effectRunInBody from './rules/effect-run-in-body.ts';
+import imperativeLoops from './rules/imperative-loops.ts';
+import noBarrelImports from './rules/no-barrel-imports.ts';
+import noOpaqueInstanceFields from './rules/no-opaque-instance-fields.ts';
+import preferArrMatch from './rules/prefer-arr-match.ts';
+import preferArrSort from './rules/prefer-arr-sort.ts';
+// ── Batch 5: Contextual rules ───────────────────────────────
+import preferDurationConstructors from './rules/prefer-duration-constructors.ts';
+import preferEffectFn from './rules/prefer-effect-fn.ts';
+import preferEffectIs from './rules/prefer-effect-is.ts';
+// ── Batch 3: Statement + type-level rules ───────────────────
+import preferMatchOverSwitch from './rules/prefer-match-over-switch.ts';
+import preferNamespaceImports from './rules/prefer-namespace-imports.ts';
+import preferOptionOverNull from './rules/prefer-option-over-null.ts';
+import preferSchemaClass from './rules/prefer-schema-class.ts';
+import requireFilterMetadata from './rules/require-filter-metadata.ts';
+import requireSchemaTypeAlias from './rules/require-schema-type-alias.ts';
+import streamLargeFiles from './rules/stream-large-files.ts';
+import throwInEffectGen from './rules/throw-in-effect-gen.ts';
+// ── Batch 4: Call expression + function pattern rules ───────
+import useClockService from './rules/use-clock-service.ts';
+import useCommandExecutorService from './rules/use-command-executor-service.ts';
+import useConsoleService from './rules/use-console-service.ts';
+import useFilesystemService from './rules/use-filesystem-service.ts';
+import useHttpClientService from './rules/use-http-client-service.ts';
+import usePathService from './rules/use-path-service.ts';
+import useRandomService from './rules/use-random-service.ts';
+import useTempFileScoped from './rules/use-temp-file-scoped.ts';
+// ── Batch 6: Special rules ──────────────────────────────────
+import vmInWrongFile from './rules/vm-in-wrong-file.ts';
+import yieldInForLoop from './rules/yield-in-for-loop.ts';
+
+export default {
+	meta: {
+		name: 'effect'
+	},
+	rules: {
+		// Batch 0
+		'avoid-try-catch': avoidTryCatch,
+		'throw-in-effect-gen': throwInEffectGen,
+
+		// Batch 1: MemberExpression
+		'avoid-data-tagged-error': avoidDataTaggedError,
+		'avoid-direct-json': avoidDirectJson,
+		'avoid-option-getorthrow': avoidOptionGetorthrow,
+		'avoid-process-env': avoidProcessEnv,
+		'use-random-service': useRandomService,
+		'effect-run-in-body': effectRunInBody,
+		'effect-promise-vs-trypromise': effectPromiseVsTrypromise,
+		'prefer-schema-class': preferSchemaClass,
+		'use-console-service': useConsoleService,
+		'prefer-arr-sort': preferArrSort,
+
+		// Batch 2: Import source
+		'avoid-node-imports': avoidNodeImports,
+		'use-filesystem-service': useFilesystemService,
+		'use-path-service': usePathService,
+		'use-temp-file-scoped': useTempFileScoped,
+		'use-command-executor-service': useCommandExecutorService,
+		'use-http-client-service': useHttpClientService,
+		'avoid-platform-coupling': avoidPlatformCoupling,
+
+		// Batch 3: Statement + type
+		'prefer-match-over-switch': preferMatchOverSwitch,
+		'imperative-loops': imperativeLoops,
+		'avoid-untagged-errors': avoidUntaggedErrors,
+		'avoid-any': avoidAny,
+		'avoid-object-type': avoidObjectType,
+		'avoid-ts-ignore': avoidTsIgnore,
+		'avoid-mutable-state': avoidMutableState,
+		'avoid-schema-suffix': avoidSchemaSuffix,
+
+		// Batch 4: Call expression
+		'use-clock-service': useClockService,
+		'avoid-native-fetch': avoidNativeFetch,
+		'avoid-react-hooks': avoidReactHooks,
+		'avoid-sync-fs': avoidSyncFs,
+		'stream-large-files': streamLargeFiles,
+		'context-tag-extends': contextTagExtends,
+
+		// Batch 5: Contextual
+		'prefer-effect-fn': preferEffectFn,
+		'yield-in-for-loop': yieldInForLoop,
+		'avoid-expect-in-if': avoidExpectInIf,
+		'avoid-yield-ref': avoidYieldRef,
+		'effect-catchall-default': effectCatchallDefault,
+		'avoid-direct-tag-checks': avoidDirectTagChecks,
+
+		// Batch 6: Special
+		'vm-in-wrong-file': vmInWrongFile,
+		'prefer-option-over-null': preferOptionOverNull,
+		'casting-awareness': castingAwareness,
+
+		// Batch 7: New rules (phase 3)
+		'prefer-namespace-imports': preferNamespaceImports,
+		'prefer-effect-is': preferEffectIs,
+		'avoid-native-object-helpers': avoidNativeObjectHelpers,
+		'prefer-duration-constructors': preferDurationConstructors,
+		'prefer-arr-match': preferArrMatch,
+		'require-schema-type-alias': requireSchemaTypeAlias,
+		'require-filter-metadata': requireFilterMetadata,
+		'no-barrel-imports': noBarrelImports,
+		'no-opaque-instance-fields': noOpaqueInstanceFields
+	}
+};
