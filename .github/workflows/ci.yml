@@ -1,0 +1,27 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    check:
+        name: Check
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: voidzero-dev/setup-vp@v1
+              with:
+                  cache: true
+
+            - name: Lint & format
+              run: vp check
+
+            - name: Test
+              run: vp test
+
+            - name: Typecheck
+              run: bun run typecheck

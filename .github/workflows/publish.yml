@@ -1,0 +1,40 @@
+name: Publish
+
+on:
+    release:
+        types: [published]
+
+jobs:
+    publish:
+        name: Publish to npm
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: '1.3.11'
+
+            - run: bun install --frozen-lockfile
+
+            - name: Build
+              run: bun run build
+
+            - name: Test
+              run: bun run test
+
+            - name: Typecheck
+              run: bun run typecheck
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: Publish
+              run: npm publish --provenance --access public
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
