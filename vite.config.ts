@@ -34,6 +34,9 @@ export default defineConfig({
 			}
 		]
 	},
+	staged: {
+		'*.{ts,tsx,js,jsx}': 'vp check --fix'
+	},
 	lint: {
 		plugins: ['typescript', 'import', 'unicorn', 'vitest'],
 		rules: {
