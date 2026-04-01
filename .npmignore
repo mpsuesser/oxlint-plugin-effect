@@ -1,0 +1,12 @@
+AGENTS.md
+CONTRIBUTING.md
+.opencode/
+.vscode/
+.github/
+test/
+opencode.json
+vitest.setup.ts
+vite.config.ts
+tsconfig.json
+tsconfig.tsbuildinfo
+bun.lock
