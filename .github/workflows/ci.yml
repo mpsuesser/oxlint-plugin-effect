@@ -17,11 +17,15 @@ jobs:
               with:
                   cache: true
 
+            - uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: '1.3.11'
+
             - name: Lint & format
               run: vp check
 
             - name: Test
-              run: vp test
+              run: bun run test
 
             - name: Typecheck
               run: bun run typecheck

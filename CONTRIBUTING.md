@@ -1,4 +1,4 @@
-# Contributing to oxlint-effect
+# Contributing to oxlint-plugin-effect-v4-hardcore
 
 Thanks for your interest in contributing. This guide covers everything you need to get started.
 
@@ -9,8 +9,8 @@ Thanks for your interest in contributing. This guide covers everything you need 
 ## Setup
 
 ```sh
-git clone https://github.com/mpsuesser/oxlint-effect.git
-cd oxlint-effect
+git clone https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore.git
+cd oxlint-plugin-effect-v4-hardcore
 bun install
 ```
 
@@ -46,6 +46,20 @@ bunx vitest run -t "reports for matching"
 - JSDoc with `@since` on every export
 - `readonly` on all fields and parameters
 
+## Editor Setup
+
+The `.vscode/` directory is gitignored. If you use VS Code, create `.vscode/settings.json` with:
+
+```json
+{
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+	"typescript.experimental.useTsgo": true
+}
+```
+
+This enables the workspace TypeScript SDK and tsgo for native type-checking.
+
 ## Reporting Issues
 
-Use the [GitHub issue templates](https://github.com/mpsuesser/oxlint-effect/issues/new/choose) for bug reports and feature requests.
+Use the [GitHub issue templates](https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore/issues/new/choose) for bug reports and feature requests.

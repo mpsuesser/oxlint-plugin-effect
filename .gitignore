@@ -5,6 +5,8 @@ build/
 *.tsbuildinfo
 .turbo/
 .opencode/
+opencode.json
+.vscode/
 .env
 .env.*
 !.env.example

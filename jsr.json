@@ -1,0 +1,12 @@
+{
+  "name": "@oxlint-plugin-effect/v4-hardcore",
+  "version": "0.1.0",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "publish": {
+    "include": ["LICENSE", "README.md", "CHANGELOG.md", "src/**/*.ts"],
+    "exclude": ["src/**/*.test.ts"]
+  }
+}

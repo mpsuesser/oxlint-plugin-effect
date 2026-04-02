@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.schemastore.org/package.json",
-  "name": "oxlint-effect",
+  "name": "oxlint-plugin-effect-v4-hardcore",
   "version": "0.1.0",
   "description": "Oxlint JS plugin enforcing Effect-first development conventions",
   "keywords": [
@@ -10,19 +10,21 @@
     "linter",
     "oxc",
     "oxlint",
+    "oxlint-plugin",
+    "oxlintplugin",
     "plugin",
     "rules",
     "typescript"
   ],
-  "homepage": "https://github.com/mpsuesser/oxlint-effect#readme",
+  "homepage": "https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore#readme",
   "bugs": {
-    "url": "https://github.com/mpsuesser/oxlint-effect/issues"
+    "url": "https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore/issues"
   },
   "license": "MIT",
   "author": "Marc Suesser",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mpsuesser/oxlint-effect.git"
+    "url": "https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore.git"
   },
   "files": [
     "src",
@@ -47,7 +49,7 @@
   "dependencies": {
     "@oxlint/plugins": "^1.57.0",
     "effect": "4.0.0-beta.43",
-    "effect-oxlint": "link:effect-oxlint"
+    "effect-oxlint": "^0.1.0"
   },
   "devDependencies": {
     "@effect/tsgo": "^0.1.1",
@@ -55,11 +57,12 @@
     "@types/bun": "^1.3.10",
     "@typescript/native-preview": "^7.0.0-dev.20260401.1",
     "typescript": "^5.9.3",
-    "vite-plus": "^0.1.14",
+    "vite-plus": "^0.1.15",
     "vitest": "^4.1.0"
   },
   "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.14"
+    "effect": "4.0.0-beta.43",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.15"
   },
   "packageManager": "bun@1.3.11"
 }

@@ -23,7 +23,7 @@ What actually happened. Include error messages or diagnostics output if applicab
 
 ## Environment
 
-- oxlint-effect version:
+- oxlint-plugin-effect-v4-hardcore version:
 - effect version:
 - effect-oxlint version:
 - @oxlint/plugins version:
