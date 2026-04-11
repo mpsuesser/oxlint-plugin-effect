@@ -6,12 +6,12 @@
       "name": "oxlint-plugin-effect-v4-hardcore",
       "dependencies": {
         "@oxlint/plugins": "^1.57.0",
-        "effect": "4.0.0-beta.43",
+        "effect": "4.0.0-beta.46",
         "effect-oxlint": "^0.1.0",
       },
       "devDependencies": {
         "@effect/tsgo": "^0.1.1",
-        "@effect/vitest": "4.0.0-beta.43",
+        "@effect/vitest": "4.0.0-beta.46",
         "@types/bun": "^1.3.10",
         "@typescript/native-preview": "^7.0.0-dev.20260401.1",
         "typescript": "^5.9.3",
@@ -20,8 +20,11 @@
       },
     },
   },
+  "patchedDependencies": {
+    "effect-oxlint@0.1.0": "patches/effect-oxlint@0.1.0.patch",
+  },
   "overrides": {
-    "effect": "4.0.0-beta.43",
+    "effect": "4.0.0-beta.46",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.1.15",
   },
   "packages": {
@@ -41,7 +44,7 @@
 
     "@effect/tsgo-win32-x64": ["@effect/tsgo-win32-x64@0.1.1", "", { "os": "win32", "cpu": "x64" }, "sha512-0bofGK/xlusC5ymSM0oKUVdNX7h8LVo88ubafAefSrMosyYoYtuW+LVWVgUF1VylqCWyjHpvxFyVsPtht/aEug=="],
 
-    "@effect/vitest": ["@effect/vitest@4.0.0-beta.43", "", { "peerDependencies": { "effect": "^4.0.0-beta.43", "vitest": "^3.0.0 || ^4.0.0" } }, "sha512-XN2LAwiUWPqbV2jrsYYRjrVydQ8MIgwr83MVImtUaOQco4vk43+8OHlXQMRN/u2HnGK29KT+O2yTMMBdk2Q6Sw=="],
+    "@effect/vitest": ["@effect/vitest@4.0.0-beta.46", "", { "peerDependencies": { "effect": "^4.0.0-beta.46", "vitest": "^3.0.0 || ^4.0.0" } }, "sha512-D3KJxcBZhdL/5Ivtt0/Vy+6UDFQs7b6wnt9/uX4IUeEJ38WzvOQ0HQqXgm8yEABIqZQa3gp6ukZ1O4XY+3hQug=="],
 
     "@jridgewell/sourcemap-codec": ["@jridgewell/sourcemap-codec@1.5.5", "", {}, "sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og=="],
 
@@ -229,7 +232,7 @@
 
     "detect-libc": ["detect-libc@2.1.2", "", {}, "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ=="],
 
-    "effect": ["effect@4.0.0-beta.43", "", { "dependencies": { "@standard-schema/spec": "^1.1.0", "fast-check": "^4.5.3", "find-my-way-ts": "^0.1.6", "ini": "^6.0.0", "kubernetes-types": "^1.30.0", "msgpackr": "^1.11.8", "multipasta": "^0.2.7", "toml": "^3.0.0", "uuid": "^13.0.0", "yaml": "^2.8.2" } }, "sha512-AJYyDimIwJOn87uUz/JzmgDc5GfjxJbXvEbTvNzMa+M3Uer344bLo/O5mMRkqc1vBleA+Ygs4+dbE3QsqOkKTQ=="],
+    "effect": ["effect@4.0.0-beta.46", "", { "dependencies": { "@standard-schema/spec": "^1.1.0", "fast-check": "^4.5.3", "find-my-way-ts": "^0.1.6", "ini": "^6.0.0", "kubernetes-types": "^1.30.0", "msgpackr": "^1.11.8", "multipasta": "^0.2.7", "toml": "^3.0.0", "uuid": "^13.0.0", "yaml": "^2.8.2" } }, "sha512-3f6gXvvUMtEueCRY0tU76Vq2Pej1SAwwE+s0Owd5nD53yS5n4RZhUA1rlCGFuSbQFA225pGy8vO72+lpvu7u5A=="],
 
     "effect-oxlint": ["effect-oxlint@0.1.0", "", { "dependencies": { "@oxlint/plugins": "^1.57.0" }, "peerDependencies": { "effect": "^4.0.0-beta.43" } }, "sha512-FssXikZRWSUnGfjTxrM61217/NmTrZdZV1IDzQsL1O5OZtoqGuI/xDH06/AhlJn93U3zMYhvfLdOYhx01s6fkg=="],
 

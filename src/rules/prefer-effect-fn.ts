@@ -5,14 +5,14 @@ import * as Ref from 'effect/Ref';
 
 import { AST, Diagnostic, Rule, RuleContext, Visitor } from 'effect-oxlint';
 
-/** Check if a CallExpression is the ServiceMap.Service(...)(...) double-call pattern. */
+/** Check if a CallExpression is the Context.Service(...)(...) double-call pattern. */
 const isServiceDefCall = (node: ESTree.CallExpression): boolean =>
 	node.callee.type === 'CallExpression' &&
 	node.callee.callee.type === 'MemberExpression' &&
-	AST.isMember(node.callee.callee, 'ServiceMap', 'Service');
+	AST.isMember(node.callee.callee, 'Context', 'Service');
 
 /**
- * Check if the second argument of a ServiceMap.Service(...)(key, { make: Effect.gen(...) })
+ * Check if the second argument of a Context.Service(...)(key, { make: Effect.gen(...) })
  * call has a `make` property whose value is Effect.gen(...).
  */
 const hasMakeEffectGen = (node: ESTree.CallExpression): boolean => {
@@ -67,7 +67,7 @@ export default Rule.define({
 					Effect.gen(function* () {
 						const call = node as ESTree.CallExpression;
 
-						// Detect ServiceMap.Service<T>()("key", { make: ... })
+						// Detect Context.Service<T>()("key", { make: ... })
 						if (isServiceDefCall(call)) {
 							yield* Ref.update(serviceDefDepth, (n) => n + 1);
 							if (hasMakeEffectGen(call)) {

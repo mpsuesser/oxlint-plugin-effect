@@ -4,8 +4,8 @@
  *
  * Expected violations:
  *   1. effect/avoid-try-catch        — line 17 (TryStatement)
- *   2. effect/use-servicemap-service  — line 27 (Context.Tag)
- *   3. effect/use-servicemap-service  — line 28 (Effect.Service)
+ *   2. effect/context-tag-extends    — line 27 (Context.Tag)
+ *   3. effect/context-tag-extends    — line 28 (Effect.Service)
  *   4. effect/throw-in-effect-gen     — line 35 (throw inside Effect.gen)
  *
  * Expected non-violations (should NOT trigger):
@@ -16,7 +16,6 @@
 // Intentional undeclared globals — this file is a violation fixture, not real code.
 declare const Context: any;
 declare const Effect: any;
-declare const ServiceMap: any;
 
 // ── Rule 1: avoid-try-catch ──────────────────────────────────
 // Should trigger: TryStatement
@@ -28,13 +27,13 @@ function riskyOperation() {
 	}
 }
 
-// ── Rule 2: use-servicemap-service ───────────────────────────
+// ── Rule 2: context-tag-extends ──────────────────────────────
 // Should trigger: Context.Tag and Effect.Service
 const _tag1 = Context.Tag();
 const _tag2 = Effect.Service();
 
 // Correct usage — should NOT trigger
-const _tag3 = ServiceMap.Service;
+const _tag3 = Context.Service;
 
 // ── Rule 3: throw-in-effect-gen ──────────────────────────────
 // Should trigger: throw inside Effect.gen

@@ -48,12 +48,12 @@
   },
   "dependencies": {
     "@oxlint/plugins": "^1.57.0",
-    "effect": "4.0.0-beta.43",
+    "effect": "4.0.0-beta.46",
     "effect-oxlint": "^0.1.0"
   },
   "devDependencies": {
     "@effect/tsgo": "^0.1.1",
-    "@effect/vitest": "4.0.0-beta.43",
+    "@effect/vitest": "4.0.0-beta.46",
     "@types/bun": "^1.3.10",
     "@typescript/native-preview": "^7.0.0-dev.20260401.1",
     "typescript": "^5.9.3",
@@ -61,8 +61,11 @@
     "vitest": "^4.1.0"
   },
   "overrides": {
-    "effect": "4.0.0-beta.43",
+    "effect": "4.0.0-beta.46",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.1.15"
   },
-  "packageManager": "bun@1.3.11"
+  "packageManager": "bun@1.3.11",
+  "patchedDependencies": {
+    "effect-oxlint@0.1.0": "patches/effect-oxlint@0.1.0.patch"
+  }
 }

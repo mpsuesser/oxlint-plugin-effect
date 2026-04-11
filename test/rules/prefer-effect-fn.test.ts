@@ -4,8 +4,8 @@ import rule from '../../src/rules/prefer-effect-fn.ts';
 import { Testing } from 'effect-oxlint';
 
 describe('prefer-effect-fn', () => {
-	it('flags Effect.gen inside ServiceMap.Service definition', () => {
-		const serviceInner = Testing.callOfMember('ServiceMap', 'Service');
+	it('flags Effect.gen inside Context.Service definition', () => {
+		const serviceInner = Testing.callOfMember('Context', 'Service');
 		const serviceOuter = {
 			type: 'CallExpression',
 			callee: serviceInner,
@@ -22,7 +22,7 @@ describe('prefer-effect-fn', () => {
 		expect(errors).toHaveLength(1);
 	});
 
-	it('allows Effect.gen outside ServiceMap.Service', () => {
+	it('allows Effect.gen outside Context.Service', () => {
 		const effectGen = Testing.callOfMember('Effect', 'gen');
 		const errors = Testing.runRuleMulti(rule, [
 			['CallExpression', effectGen],
@@ -31,8 +31,8 @@ describe('prefer-effect-fn', () => {
 		expect(errors).toHaveLength(0);
 	});
 
-	it('allows Effect.fn inside ServiceMap.Service', () => {
-		const serviceInner = Testing.callOfMember('ServiceMap', 'Service');
+	it('allows Effect.fn inside Context.Service', () => {
+		const serviceInner = Testing.callOfMember('Context', 'Service');
 		const serviceOuter = {
 			type: 'CallExpression',
 			callee: serviceInner,
@@ -52,8 +52,8 @@ describe('prefer-effect-fn', () => {
 		expect(errors).toHaveLength(0);
 	});
 
-	it('allows Effect.fnUntraced inside ServiceMap.Service', () => {
-		const serviceInner = Testing.callOfMember('ServiceMap', 'Service');
+	it('allows Effect.fnUntraced inside Context.Service', () => {
+		const serviceInner = Testing.callOfMember('Context', 'Service');
 		const serviceOuter = {
 			type: 'CallExpression',
 			callee: serviceInner,

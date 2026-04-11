@@ -94,19 +94,19 @@ Every rule ships a clear diagnostic message explaining _why_ the pattern is prob
 
 ### Complex / contextual rules
 
-| Rule                                 | What it flags                                                                                                    |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `effect/context-tag-extends`         | Removed Effect v4 APIs (`Context.Tag`, `Context.GenericTag`, `Effect.Service`) -- use `ServiceMap.Service`       |
-| `effect/throw-in-effect-gen`         | `throw` inside `Effect.gen` -- use `yield* Effect.fail()` (allows throw inside `Effect.tryPromise({ try })`)     |
-| `effect/prefer-effect-fn`            | `Effect.gen` assigned to variables or used in service methods -- use `Effect.fn` for automatic tracing           |
-| `effect/yield-in-for-loop`           | `yield*` inside `for` loops -- use `Effect.forEach`                                                              |
-| `effect/avoid-expect-in-if`          | `expect()` inside `if` blocks in tests -- leads to silently passing tests                                        |
-| `effect/avoid-yield-ref`             | Incorrect `yield*` usage with `Ref`                                                                              |
-| `effect/effect-catchall-default`     | `Effect.catch` / `Effect.catchCause` returning `Effect.succeed(default)` -- use `catchTag` for targeted recovery |
-| `effect/avoid-direct-tag-checks`     | Direct `_tag` checks -- use `Match` or Effect predicates                                                         |
-| `effect/vm-in-wrong-file`            | View Model interfaces and layers outside `.vm.ts` files                                                          |
-| `effect/use-temp-file-scoped`        | Temporary file usage that should be scoped                                                                       |
-| `effect/avoid-native-object-helpers` | `Object.keys`, `Object.entries`, etc. -- use `R.*` from `effect/Record`                                          |
+| Rule                                 | What it flags                                                                                                                                        |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `effect/context-tag-extends`         | Removed Effect v4 APIs (`Context.Tag`, `Context.GenericTag`, `Effect.Service`) and old `ServiceMap.*` aliases -- use `Context.Service` / `Context.*` |
+| `effect/throw-in-effect-gen`         | `throw` inside `Effect.gen` -- use `yield* Effect.fail()` (allows throw inside `Effect.tryPromise({ try })`)                                         |
+| `effect/prefer-effect-fn`            | `Effect.gen` assigned to variables or used in service methods -- use `Effect.fn` for automatic tracing                                               |
+| `effect/yield-in-for-loop`           | `yield*` inside `for` loops -- use `Effect.forEach`                                                                                                  |
+| `effect/avoid-expect-in-if`          | `expect()` inside `if` blocks in tests -- leads to silently passing tests                                                                            |
+| `effect/avoid-yield-ref`             | Incorrect `yield*` usage with `Ref`                                                                                                                  |
+| `effect/effect-catchall-default`     | `Effect.catch` / `Effect.catchCause` returning `Effect.succeed(default)` -- use `catchTag` for targeted recovery                                     |
+| `effect/avoid-direct-tag-checks`     | Direct `_tag` checks -- use `Match` or Effect predicates                                                                                             |
+| `effect/vm-in-wrong-file`            | View Model interfaces and layers outside `.vm.ts` files                                                                                              |
+| `effect/use-temp-file-scoped`        | Temporary file usage that should be scoped                                                                                                           |
+| `effect/avoid-native-object-helpers` | `Object.keys`, `Object.entries`, etc. -- use `R.*` from `effect/Record`                                                                              |
 
 ### Pattern enforcement rules
 

@@ -1,0 +1,23 @@
+diff --git a/src/RuleContext.ts b/src/RuleContext.ts
+index 8a63d0bce62f9aea227ab2374aa32ad2aa9b6edb..fac8308eccf43dbd268c43cb56b8303be4b33770 100644
+--- a/src/RuleContext.ts
++++ b/src/RuleContext.ts
+@@ -15,8 +15,8 @@ import type {
+ 	Settings,
+ 	SourceCode
+ } from '@oxlint/plugins';
++import * as Context from 'effect/Context';
+ import * as Effect from 'effect/Effect';
+-import * as ServiceMap from 'effect/ServiceMap';
+ 
+ // ---------------------------------------------------------------------------
+ // Service
+@@ -30,7 +30,7 @@ import * as ServiceMap from 'effect/ServiceMap';
+  *
+  * @since 0.1.0
+  */
+-export class RuleContext extends ServiceMap.Service<
++export class RuleContext extends Context.Service<
+ 	RuleContext,
+ 	{
+ 		/** Report a lint diagnostic for the current file. */

@@ -11,8 +11,8 @@ describe('context-tag-extends', () => {
 		expect(Testing.runRule(rule, 'ClassDeclaration', node)).toHaveLength(1);
 	});
 
-	it('allows class Foo extends ServiceMap.Service()', () => {
-		const superClass = Testing.callOfMember('ServiceMap', 'Service');
+	it('allows class Foo extends Context.Service()', () => {
+		const superClass = Testing.callOfMember('Context', 'Service');
 		const node = Testing.classDecl('Foo', { superClass });
 		expect(Testing.runRule(rule, 'ClassDeclaration', node)).toHaveLength(0);
 	});
@@ -28,7 +28,7 @@ describe('context-tag-extends', () => {
 		).toHaveLength(1);
 	});
 
-	// ── MemberExpression: bare Context.Tag (merged from use-servicemap-service) ──
+	// ── MemberExpression: bare Context.Tag ──
 	it('flags bare Context.Tag usage', () => {
 		const errors = Testing.runRule(
 			rule,
@@ -39,7 +39,7 @@ describe('context-tag-extends', () => {
 		expect(errors[0]?.diagnostic.message).toContain('Context.Tag');
 	});
 
-	// ── MemberExpression: bare Effect.Service (merged from use-servicemap-service) ──
+	// ── MemberExpression: bare Effect.Service ──
 	it('flags bare Effect.Service usage', () => {
 		const errors = Testing.runRule(
 			rule,
@@ -79,7 +79,7 @@ describe('context-tag-extends', () => {
 		expect(Testing.runRule(rule, 'CallExpression', node)).toHaveLength(0);
 	});
 
-	// ── Negative: ServiceMap.Service is fine ──
+	// ── Negative: Context.* APIs are fine ──
 	it('allows Context.Layer', () => {
 		expect(
 			Testing.runRule(
@@ -90,13 +90,33 @@ describe('context-tag-extends', () => {
 		).toHaveLength(0);
 	});
 
-	it('does not flag ServiceMap.Service', () => {
+	it('allows Context.Reference', () => {
 		expect(
 			Testing.runRule(
 				rule,
 				'MemberExpression',
-				Testing.memberExpr('ServiceMap', 'Service')
+				Testing.memberExpr('Context', 'Reference')
 			)
 		).toHaveLength(0);
+	});
+
+	it('flags ServiceMap.Service', () => {
+		const errors = Testing.runRule(
+			rule,
+			'MemberExpression',
+			Testing.memberExpr('ServiceMap', 'Service')
+		);
+		expect(errors).toHaveLength(1);
+		expect(errors[0]?.diagnostic.message).toContain('Context.Service');
+	});
+
+	it('flags ServiceMap.Reference', () => {
+		const errors = Testing.runRule(
+			rule,
+			'MemberExpression',
+			Testing.memberExpr('ServiceMap', 'Reference')
+		);
+		expect(errors).toHaveLength(1);
+		expect(errors[0]?.diagnostic.message).toContain('Context.Reference');
 	});
 });

@@ -9,7 +9,7 @@ export default Rule.define({
 	meta: Rule.meta({
 		type: 'problem',
 		description:
-			'Disallow removed Context/Effect service APIs — use ServiceMap.Service (Effect v4)'
+			'Disallow removed Context/Effect service APIs and old ServiceMap aliases — use Context.Service and Context.* (Effect v4 beta.46)'
 	}),
 	create: function* () {
 		const ctx = yield* RuleContext;
@@ -30,7 +30,7 @@ export default Rule.define({
 							Diagnostic.make({
 								node,
 								message:
-									'The `class *Tag extends Context.Tag` pattern was removed in Effect v4. Use `ServiceMap.Service` instead, and name the service directly (no *Tag suffix).'
+									'The `class *Tag extends Context.Tag` pattern was removed in Effect v4. Use `Context.Service` instead, and name the service directly (no *Tag suffix).'
 							})
 						);
 					}
@@ -47,7 +47,7 @@ export default Rule.define({
 							Diagnostic.make({
 								node,
 								message:
-									'`Context.GenericTag` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
+									'`Context.GenericTag` was removed in Effect v4. Use `Context.Service` for service definitions instead.'
 							})
 						);
 					}
@@ -58,7 +58,7 @@ export default Rule.define({
 							Diagnostic.make({
 								node,
 								message:
-									'`Context.Tag` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
+									'`Context.Tag` was removed in Effect v4. Use `Context.Service` for service definitions instead.'
 							})
 						);
 					}
@@ -69,62 +69,73 @@ export default Rule.define({
 							Diagnostic.make({
 								node,
 								message:
-									'`Effect.Service` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
+									'`Effect.Service` was removed in Effect v4. Use `Context.Service` for service definitions instead.'
 							})
 						);
 					}
 
-					// Flag `Context.Reference`
-					if (AST.isMember(member, 'Context', 'Reference')) {
+					// Flag `ServiceMap.Service`
+					if (AST.isMember(member, 'ServiceMap', 'Service')) {
 						return ctx.report(
 							Diagnostic.make({
 								node,
 								message:
-									'`Context.Reference` was removed in Effect v4. Use `ServiceMap.Reference` instead.'
+									'`ServiceMap.Service` was removed before Effect v4 beta.46 stabilized. Use `Context.Service` for service definitions instead.'
 							})
 						);
 					}
 
-					// Flag `Context.make`
-					if (AST.isMember(member, 'Context', 'make')) {
+					// Flag `ServiceMap.Reference`
+					if (AST.isMember(member, 'ServiceMap', 'Reference')) {
 						return ctx.report(
 							Diagnostic.make({
 								node,
 								message:
-									'`Context.make` was removed in Effect v4. Use `ServiceMap.make` instead.'
+									'`ServiceMap.Reference` was removed before Effect v4 beta.46 stabilized. Use `Context.Reference` instead.'
 							})
 						);
 					}
 
-					// Flag `Context.get`
-					if (AST.isMember(member, 'Context', 'get')) {
+					// Flag `ServiceMap.make`
+					if (AST.isMember(member, 'ServiceMap', 'make')) {
 						return ctx.report(
 							Diagnostic.make({
 								node,
 								message:
-									'`Context.get` was removed in Effect v4. Use `ServiceMap.get` instead.'
+									'`ServiceMap.make` was removed before Effect v4 beta.46 stabilized. Use `Context.make` instead.'
 							})
 						);
 					}
 
-					// Flag `Context.add`
-					if (AST.isMember(member, 'Context', 'add')) {
+					// Flag `ServiceMap.get`
+					if (AST.isMember(member, 'ServiceMap', 'get')) {
 						return ctx.report(
 							Diagnostic.make({
 								node,
 								message:
-									'`Context.add` was removed in Effect v4. Use `ServiceMap.add` instead.'
+									'`ServiceMap.get` was removed before Effect v4 beta.46 stabilized. Use `Context.get` instead.'
 							})
 						);
 					}
 
-					// Flag `Context.mergeAll`
-					if (AST.isMember(member, 'Context', 'mergeAll')) {
+					// Flag `ServiceMap.add`
+					if (AST.isMember(member, 'ServiceMap', 'add')) {
 						return ctx.report(
 							Diagnostic.make({
 								node,
 								message:
-									'`Context.mergeAll` was removed in Effect v4. Use `ServiceMap.mergeAll` instead.'
+									'`ServiceMap.add` was removed before Effect v4 beta.46 stabilized. Use `Context.add` instead.'
+							})
+						);
+					}
+
+					// Flag `ServiceMap.mergeAll`
+					if (AST.isMember(member, 'ServiceMap', 'mergeAll')) {
+						return ctx.report(
+							Diagnostic.make({
+								node,
+								message:
+									'`ServiceMap.mergeAll` was removed before Effect v4 beta.46 stabilized. Use `Context.mergeAll` instead.'
 							})
 						);
 					}
@@ -151,7 +162,7 @@ export default Rule.define({
 								Diagnostic.make({
 									node,
 									message:
-										'`Effect.Service` was removed in Effect v4. Use `ServiceMap.Service` for service definitions instead.'
+										'`Effect.Service` was removed in Effect v4. Use `Context.Service` for service definitions instead.'
 								})
 							);
 						}
