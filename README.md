@@ -1,7 +1,6 @@
-# oxlint-plugin-effect-v4-hardcore
+# oxlint-plugin-effect
 
-[![npm](https://img.shields.io/npm/v/oxlint-plugin-effect-v4-hardcore)](https://www.npmjs.com/package/oxlint-plugin-effect-v4-hardcore)
-[![JSR](https://jsr.io/badges/@oxlint-plugin-effect/v4-hardcore)](https://jsr.io/@oxlint-plugin-effect/v4-hardcore)
+[![npm](https://img.shields.io/npm/v/oxlint-plugin-effect)](https://www.npmjs.com/package/oxlint-plugin-effect)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 An opinionated [oxlint](https://oxc.rs/docs/guide/usage/linter) plugin for [Effect v4](https://effect.website) that drives your codebase toward being fully Effect-first. It flags imperative patterns, raw Node APIs, untyped errors, and other non-idiomatic code, steering every module toward Effect services, typed error channels, and functional composition.
@@ -11,15 +10,11 @@ An opinionated [oxlint](https://oxc.rs/docs/guide/usage/linter) plugin for [Effe
 ## Installation
 
 ```sh
-npm install oxlint-plugin-effect-v4-hardcore
+npm install oxlint-plugin-effect
 ```
 
 ```sh
-bun add oxlint-plugin-effect-v4-hardcore
-```
-
-```sh
-deno add jsr:@oxlint-plugin-effect/v4-hardcore
+bun add oxlint-plugin-effect
 ```
 
 Then register the plugin in your oxlint config:
@@ -27,7 +22,7 @@ Then register the plugin in your oxlint config:
 ```jsonc
 // oxlint.json
 {
-	"plugins": ["oxlint-plugin-effect-v4-hardcore"]
+	"plugins": ["oxlint-plugin-effect"]
 }
 ```
 

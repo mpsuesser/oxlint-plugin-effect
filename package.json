@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.schemastore.org/package.json",
-  "name": "oxlint-plugin-effect-v4-hardcore",
+  "name": "oxlint-plugin-effect",
   "version": "0.1.0",
   "description": "Oxlint JS plugin enforcing Effect-first development conventions",
   "keywords": [
@@ -16,15 +16,15 @@
     "rules",
     "typescript"
   ],
-  "homepage": "https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore#readme",
+  "homepage": "https://github.com/mpsuesser/oxlint-plugin-effect",
   "bugs": {
-    "url": "https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore/issues"
+    "url": "https://github.com/mpsuesser/oxlint-plugin-effect/issues"
   },
   "license": "MIT",
   "author": "Marc Suesser",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore.git"
+    "url": "https://github.com/mpsuesser/oxlint-plugin-effect.git"
   },
   "files": [
     "src",

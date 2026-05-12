@@ -1,4 +1,4 @@
-# Contributing to oxlint-plugin-effect-v4-hardcore
+# Contributing to oxlint-plugin-effect
 
 Thanks for your interest in contributing. This guide covers everything you need to get started.
 
@@ -9,8 +9,8 @@ Thanks for your interest in contributing. This guide covers everything you need 
 ## Setup
 
 ```sh
-git clone https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore.git
-cd oxlint-plugin-effect-v4-hardcore
+git clone https://github.com/mpsuesser/oxlint-plugin-effect.git
+cd oxlint-plugin-effect
 bun install
 ```
 
@@ -62,4 +62,4 @@ This enables the workspace TypeScript SDK and tsgo for native type-checking.
 
 ## Reporting Issues
 
-Use the [GitHub issue templates](https://github.com/mpsuesser/oxlint-plugin-effect-v4-hardcore/issues/new/choose) for bug reports and feature requests.
+Use the [GitHub issue templates](https://github.com/mpsuesser/oxlint-plugin-effect/issues/new/choose) for bug reports and feature requests.
