@@ -1,3 +1,5 @@
+import type { CreateRule } from '@oxlint/plugins';
+
 import { Plugin } from 'effect-oxlint';
 
 import avoidAny from './rules/avoid-any.ts';
@@ -55,75 +57,97 @@ import useTempFileScoped from './rules/use-temp-file-scoped.ts';
 import vmInWrongFile from './rules/vm-in-wrong-file.ts';
 import yieldInForLoop from './rules/yield-in-for-loop.ts';
 
+/**
+ * Mark a rule as part of the plugin's recommended set.
+ *
+ * Users can then enable every Effect rule at once via
+ * `"categories": { "recommended": "error" }` in `oxlint.json`, instead of
+ * having to list each rule individually.
+ */
+const recommend = (rule: CreateRule): CreateRule => ({
+	...rule,
+	meta: {
+		...rule.meta,
+		docs: {
+			...rule.meta?.docs,
+			recommended: true
+		}
+	}
+});
+
+const rules: Record<string, CreateRule> = {
+	// ── Statement bans ───────────────────────────────────────
+	'avoid-try-catch': avoidTryCatch,
+	'prefer-match-over-switch': preferMatchOverSwitch,
+	'imperative-loops': imperativeLoops,
+
+	// ── Member expression bans ───────────────────────────────
+	'avoid-data-tagged-error': avoidDataTaggedError,
+	'avoid-direct-json': avoidDirectJson,
+	'avoid-option-getorthrow': avoidOptionGetorthrow,
+	'avoid-process-env': avoidProcessEnv,
+	'use-random-service': useRandomService,
+	'effect-run-in-body': effectRunInBody,
+	'effect-promise-vs-trypromise': effectPromiseVsTrypromise,
+	'prefer-schema-class': preferSchemaClass,
+	'use-console-service': useConsoleService,
+	'stream-large-files': streamLargeFiles,
+
+	// ── Import bans ──────────────────────────────────────────
+	'use-filesystem-service': useFilesystemService,
+	'use-path-service': usePathService,
+	'use-command-executor-service': useCommandExecutorService,
+	'use-http-client-service': useHttpClientService,
+	'avoid-platform-coupling': avoidPlatformCoupling,
+	'avoid-node-imports': avoidNodeImports,
+
+	// ── Type-level rules ─────────────────────────────────────
+	'avoid-any': avoidAny,
+	'avoid-object-type': avoidObjectType,
+	'avoid-ts-ignore': avoidTsIgnore,
+	'avoid-mutable-state': avoidMutableState,
+	'avoid-schema-suffix': avoidSchemaSuffix,
+	'avoid-non-null-assertion': avoidNonNullAssertion,
+	'prefer-option-over-null': preferOptionOverNull,
+	'casting-awareness': castingAwareness,
+
+	// ── Call expression rules ────────────────────────────────
+	'use-clock-service': useClockService,
+	'avoid-native-fetch': avoidNativeFetch,
+	'avoid-react-hooks': avoidReactHooks,
+	'avoid-sync-fs': avoidSyncFs,
+	'avoid-untagged-errors': avoidUntaggedErrors,
+	'prefer-arr-sort': preferArrSort,
+
+	// ── Complex / contextual rules ───────────────────────────
+	'context-tag-extends': contextTagExtends,
+	'throw-in-effect-gen': throwInEffectGen,
+	'prefer-effect-fn': preferEffectFn,
+	'yield-in-for-loop': yieldInForLoop,
+	'avoid-expect-in-if': avoidExpectInIf,
+	'avoid-yield-ref': avoidYieldRef,
+	'effect-catchall-default': effectCatchallDefault,
+	'avoid-direct-tag-checks': avoidDirectTagChecks,
+	'vm-in-wrong-file': vmInWrongFile,
+	'use-temp-file-scoped': useTempFileScoped,
+	'avoid-native-object-helpers': avoidNativeObjectHelpers,
+
+	// ── Pattern enforcement rules ────────────────────────────
+	'prefer-namespace-imports': preferNamespaceImports,
+	'prefer-effect-is': preferEffectIs,
+	'prefer-duration-constructors': preferDurationConstructors,
+	'prefer-arr-match': preferArrMatch,
+	'prefer-redacted-config': preferRedactedConfig,
+	'require-schema-type-alias': requireSchemaTypeAlias,
+	'require-filter-metadata': requireFilterMetadata,
+	'require-effect-concurrency': requireEffectConcurrency,
+	'no-barrel-imports': noBarrelImports,
+	'no-opaque-instance-fields': noOpaqueInstanceFields
+};
+
 export default Plugin.define({
 	name: 'effect',
-	rules: {
-		// ── Statement bans ───────────────────────────────────────
-		'avoid-try-catch': avoidTryCatch,
-		'prefer-match-over-switch': preferMatchOverSwitch,
-		'imperative-loops': imperativeLoops,
-
-		// ── Member expression bans ───────────────────────────────
-		'avoid-data-tagged-error': avoidDataTaggedError,
-		'avoid-direct-json': avoidDirectJson,
-		'avoid-option-getorthrow': avoidOptionGetorthrow,
-		'avoid-process-env': avoidProcessEnv,
-		'use-random-service': useRandomService,
-		'effect-run-in-body': effectRunInBody,
-		'effect-promise-vs-trypromise': effectPromiseVsTrypromise,
-		'prefer-schema-class': preferSchemaClass,
-		'use-console-service': useConsoleService,
-		'stream-large-files': streamLargeFiles,
-
-		// ── Import bans ──────────────────────────────────────────
-		'use-filesystem-service': useFilesystemService,
-		'use-path-service': usePathService,
-		'use-command-executor-service': useCommandExecutorService,
-		'use-http-client-service': useHttpClientService,
-		'avoid-platform-coupling': avoidPlatformCoupling,
-		'avoid-node-imports': avoidNodeImports,
-
-		// ── Type-level rules ─────────────────────────────────────
-		'avoid-any': avoidAny,
-		'avoid-object-type': avoidObjectType,
-		'avoid-ts-ignore': avoidTsIgnore,
-		'avoid-mutable-state': avoidMutableState,
-		'avoid-schema-suffix': avoidSchemaSuffix,
-		'avoid-non-null-assertion': avoidNonNullAssertion,
-		'prefer-option-over-null': preferOptionOverNull,
-		'casting-awareness': castingAwareness,
-
-		// ── Call expression rules ────────────────────────────────
-		'use-clock-service': useClockService,
-		'avoid-native-fetch': avoidNativeFetch,
-		'avoid-react-hooks': avoidReactHooks,
-		'avoid-sync-fs': avoidSyncFs,
-		'avoid-untagged-errors': avoidUntaggedErrors,
-		'prefer-arr-sort': preferArrSort,
-
-		// ── Complex / contextual rules ───────────────────────────
-		'context-tag-extends': contextTagExtends,
-		'throw-in-effect-gen': throwInEffectGen,
-		'prefer-effect-fn': preferEffectFn,
-		'yield-in-for-loop': yieldInForLoop,
-		'avoid-expect-in-if': avoidExpectInIf,
-		'avoid-yield-ref': avoidYieldRef,
-		'effect-catchall-default': effectCatchallDefault,
-		'avoid-direct-tag-checks': avoidDirectTagChecks,
-		'vm-in-wrong-file': vmInWrongFile,
-		'use-temp-file-scoped': useTempFileScoped,
-		'avoid-native-object-helpers': avoidNativeObjectHelpers,
-
-		// ── Pattern enforcement rules ────────────────────────────
-		'prefer-namespace-imports': preferNamespaceImports,
-		'prefer-effect-is': preferEffectIs,
-		'prefer-duration-constructors': preferDurationConstructors,
-		'prefer-arr-match': preferArrMatch,
-		'prefer-redacted-config': preferRedactedConfig,
-		'require-schema-type-alias': requireSchemaTypeAlias,
-		'require-filter-metadata': requireFilterMetadata,
-		'require-effect-concurrency': requireEffectConcurrency,
-		'no-barrel-imports': noBarrelImports,
-		'no-opaque-instance-fields': noOpaqueInstanceFields
-	}
+	rules: Object.fromEntries(
+		Object.entries(rules).map(([name, rule]) => [name, recommend(rule)])
+	)
 });
