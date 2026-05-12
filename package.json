@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.schemastore.org/package.json",
-  "name": "oxlint-plugin-effect",
+  "name": "@mpsuesser/oxlint-plugin-effect",
   "version": "0.1.0",
   "description": "Oxlint JS plugin enforcing Effect-first development conventions",
   "keywords": [
