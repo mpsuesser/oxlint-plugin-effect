@@ -1,6 +1,7 @@
 # oxlint-plugin-effect
 
 [![npm](https://img.shields.io/npm/v/@mpsuesser/oxlint-plugin-effect)](https://www.npmjs.com/package/@mpsuesser/oxlint-plugin-effect)
+[![JSR](https://jsr.io/badges/@mpsuesser/oxlint-plugin-effect)](https://jsr.io/@mpsuesser/oxlint-plugin-effect)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 An opinionated [oxlint](https://oxc.rs/docs/guide/usage/linter) plugin for [Effect v4](https://effect.website) that drives every module toward Effect services, typed error channels, and functional composition. It flags imperative patterns, raw Node APIs, untyped errors, and other non-idiomatic shapes at the lint layer so they never make it into review.
