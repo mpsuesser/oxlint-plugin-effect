@@ -9,6 +9,7 @@ import avoidMutableState from './rules/avoid-mutable-state.ts';
 import avoidNativeFetch from './rules/avoid-native-fetch.ts';
 import avoidNativeObjectHelpers from './rules/avoid-native-object-helpers.ts';
 import avoidNodeImports from './rules/avoid-node-imports.ts';
+import avoidNonNullAssertion from './rules/avoid-non-null-assertion.ts';
 import avoidObjectType from './rules/avoid-object-type.ts';
 import avoidOptionGetorthrow from './rules/avoid-option-getorthrow.ts';
 import avoidPlatformCoupling from './rules/avoid-platform-coupling.ts';
@@ -36,7 +37,9 @@ import preferEffectIs from './rules/prefer-effect-is.ts';
 import preferMatchOverSwitch from './rules/prefer-match-over-switch.ts';
 import preferNamespaceImports from './rules/prefer-namespace-imports.ts';
 import preferOptionOverNull from './rules/prefer-option-over-null.ts';
+import preferRedactedConfig from './rules/prefer-redacted-config.ts';
 import preferSchemaClass from './rules/prefer-schema-class.ts';
+import requireEffectConcurrency from './rules/require-effect-concurrency.ts';
 import requireFilterMetadata from './rules/require-filter-metadata.ts';
 import requireSchemaTypeAlias from './rules/require-schema-type-alias.ts';
 import streamLargeFiles from './rules/stream-large-files.ts';
@@ -86,6 +89,7 @@ export default Plugin.define({
 		'avoid-ts-ignore': avoidTsIgnore,
 		'avoid-mutable-state': avoidMutableState,
 		'avoid-schema-suffix': avoidSchemaSuffix,
+		'avoid-non-null-assertion': avoidNonNullAssertion,
 		'prefer-option-over-null': preferOptionOverNull,
 		'casting-awareness': castingAwareness,
 
@@ -115,8 +119,10 @@ export default Plugin.define({
 		'prefer-effect-is': preferEffectIs,
 		'prefer-duration-constructors': preferDurationConstructors,
 		'prefer-arr-match': preferArrMatch,
+		'prefer-redacted-config': preferRedactedConfig,
 		'require-schema-type-alias': requireSchemaTypeAlias,
 		'require-filter-metadata': requireFilterMetadata,
+		'require-effect-concurrency': requireEffectConcurrency,
 		'no-barrel-imports': noBarrelImports,
 		'no-opaque-instance-fields': noOpaqueInstanceFields
 	}
