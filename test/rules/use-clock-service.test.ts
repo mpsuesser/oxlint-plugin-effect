@@ -4,12 +4,14 @@ import rule from '../../src/rules/use-clock-service.ts';
 import { Testing } from 'effect-oxlint';
 
 describe('use-clock-service', () => {
-	it('flags new Date() (no arguments = current time)', () => {
+	// ── NewExpression ──
+	it('flags `new Date()` (current time)', () => {
 		expect(
 			Testing.runRule(rule, 'NewExpression', Testing.newExpr('Date'))
 		).toHaveLength(1);
 	});
-	it('allows new Date(timestamp) (conversion, not current time)', () => {
+
+	it('flags `new Date(timestamp)` (parse-from-number)', () => {
 		expect(
 			Testing.runRule(
 				rule,
@@ -18,9 +20,10 @@ describe('use-clock-service', () => {
 					{ type: 'Literal', value: 1234567890 }
 				])
 			)
-		).toHaveLength(0);
+		).toHaveLength(1);
 	});
-	it('allows new Date(string) (parsing, not current time)', () => {
+
+	it('flags `new Date(string)` (parse-from-string)', () => {
 		expect(
 			Testing.runRule(
 				rule,
@@ -29,14 +32,37 @@ describe('use-clock-service', () => {
 					{ type: 'Literal', value: '2024-01-01' }
 				])
 			)
-		).toHaveLength(0);
+		).toHaveLength(1);
 	});
-	it('allows new Map()', () => {
+
+	it('flags `new Date(y, m, d)` (component constructor)', () => {
+		expect(
+			Testing.runRule(
+				rule,
+				'NewExpression',
+				Testing.newExpr('Date', [
+					{ type: 'Literal', value: 2024 },
+					{ type: 'Literal', value: 0 },
+					{ type: 'Literal', value: 1 }
+				])
+			)
+		).toHaveLength(1);
+	});
+
+	it('allows `new Map()`', () => {
 		expect(
 			Testing.runRule(rule, 'NewExpression', Testing.newExpr('Map'))
 		).toHaveLength(0);
 	});
-	it('flags Date.now', () => {
+
+	it('allows `new DateTime(...)` (unrelated identifier)', () => {
+		expect(
+			Testing.runRule(rule, 'NewExpression', Testing.newExpr('DateTime'))
+		).toHaveLength(0);
+	});
+
+	// ── MemberExpression — covers every `Date.*` static ──
+	it('flags `Date.now`', () => {
 		expect(
 			Testing.runRule(
 				rule,
@@ -45,7 +71,8 @@ describe('use-clock-service', () => {
 			)
 		).toHaveLength(1);
 	});
-	it('flags Date.parse', () => {
+
+	it('flags `Date.parse`', () => {
 		expect(
 			Testing.runRule(
 				rule,
@@ -54,7 +81,8 @@ describe('use-clock-service', () => {
 			)
 		).toHaveLength(1);
 	});
-	it('flags Date.UTC', () => {
+
+	it('flags `Date.UTC`', () => {
 		expect(
 			Testing.runRule(
 				rule,
@@ -63,12 +91,33 @@ describe('use-clock-service', () => {
 			)
 		).toHaveLength(1);
 	});
-	it('allows DateTime.now', () => {
+
+	it('flags any other `Date.<static>` (e.g. `Date.fromTimestamp`)', () => {
+		expect(
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('Date', 'fromTimestamp')
+			)
+		).toHaveLength(1);
+	});
+
+	it('allows `DateTime.now`', () => {
 		expect(
 			Testing.runRule(
 				rule,
 				'MemberExpression',
 				Testing.memberExpr('DateTime', 'now')
+			)
+		).toHaveLength(0);
+	});
+
+	it('allows `Clock.currentTimeMillis`', () => {
+		expect(
+			Testing.runRule(
+				rule,
+				'MemberExpression',
+				Testing.memberExpr('Clock', 'currentTimeMillis')
 			)
 		).toHaveLength(0);
 	});
