@@ -5,7 +5,7 @@ import { Rule, RuleContext, Visitor } from 'effect-oxlint';
 import type { ESTree } from '@oxlint/plugins';
 
 const isForbiddenLowercaseName = Schema.is(
-	Schema.String.check(Schema.isIncludes('shape'))
+	Schema.String.check(Schema.isIncluding('shape'))
 );
 const containsForbiddenSymbolName = (name: string) =>
 	isForbiddenLowercaseName(Str.toLowerCase(name));

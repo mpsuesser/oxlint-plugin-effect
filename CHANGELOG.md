@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1 - Effect 4.0.0
+
+### Fixed
+
+- Supported `effect` 4.0.0, where `Schema.isIncludes` is renamed to `Schema.isIncluding`. `no-shape-in-symbol-names` now uses the new name, and the `effect` dependency and override move to 4.0.0 with `@effect/vitest` 4.0.0.
+
 ## 0.5.0 - Anti-slop rules
 
 ### Added
